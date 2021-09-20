@@ -1,7 +1,7 @@
 from flask import Flask, render_template
 
 # creating the app
-app = Flask(__name__, template_folder='template/static')
+app = Flask(__name__, template_folder='templates')
 
 
 @app.route("/", methods=['GET'])
