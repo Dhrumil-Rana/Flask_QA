@@ -1,9 +1,13 @@
-from flask import Flask
+from flask import Flask, render_template
 
-#creating the app
-app = Flask(__name__)
+# creating the app
+app = Flask(__name__, template_folder='template/static')
 
 
 @app.route("/", methods=['GET'])
-def home():
-    return "This is the homepage"
+def sign_in():
+    return render_template("login.html")
+
+@app.route("/signin", methods=['GET'])
+def content():
+    return "This is the signin page"
