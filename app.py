@@ -10,4 +10,4 @@ def sign_in():
 
 @app.route("/signin", methods=['GET'])
 def content():
-    return "This is the signin page"
+    return "This is going to be a homepage"
