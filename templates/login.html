@@ -2,11 +2,23 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{{Username}}</title>
+    <title>Login Page</title>
     <link rel="stylesheet" type = "text/css" href="{{ url_for ('static' , filename='css/login.css') }}">
 </head>
-<body>
- <h1> Welcome to our website. </h1>
- <h1>Enter your login credential</h1>
+
+<h1> Welcome <br>
+Login below
+
+<form action="/login" method="post">
+  <h2></h2>Username:<br>
+  <input type="text" name='username'><br>
+  Password:<br>
+  <input name='password' ><br><br>
+<input type="submit" value="Login">
+</form>
+</h1>
+<h1 >
+    {{info}}</h1>
+
 </body>
 </html>
