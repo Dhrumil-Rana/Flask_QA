@@ -8,8 +8,11 @@ app = Flask(__name__, template_folder='template/static')
 def sign_in():
     return flask.render_template("login.html")
 
+
 @app.route("/signin", methods=['GET'])
 def content():
     return "This is the signin page"
 
-app.run()
+
+if name == "__main__":
+    app.run()
