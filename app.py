@@ -1,10 +1,11 @@
 from flask import Flask,request,render_template
 from flask_sqlalchemy import SQLAlchemy
 import pickle
+import bcrypt
 
 app = Flask(__name__)
 
-ENV = 'prod'
+ENV = 'dev'
 #this is for localhost
 if ENV == 'dev':
     app.debug = True
@@ -31,18 +32,24 @@ class accounts(db.Model):
 
 @app.route('/')
 def hello_world():
+
+    #used to generate hashed password, insert this generated hash into database without the b
+    #hashtest = bcrypt.hashpw(b'123', bcrypt.gensalt())
+    #print(hashtest)
+
     return render_template("login.html")
 
 @app.route('/login',methods=['POST','GET'])
 def login():
     nameIN=request.form['username']
-    passwordIN=request.form['password']
+    passwordIN=request.form['password'].encode('utf-8')
 
 
     #check if username is in the accounts database
     user = accounts.query.filter_by(username=nameIN).first()
     if user:
-        if user.password == passwordIN:
+        #compare password given to database hash
+        if bcrypt.checkpw(passwordIN, user.password.encode('utf-8') ):
             if user.role == 'U':
                 return render_template('home.html',name = nameIN, userlevel='user')
             else:

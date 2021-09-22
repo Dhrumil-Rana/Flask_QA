@@ -3,7 +3,7 @@ create table users(
 	id int NOT NULL AUTO_INCREMENT,
 	username varchar(20) not null,
 	password varchar(20) not null,
-	userlevel varchar(10) not null,
+	role varchar(1) not null,
 	primary key(id)
 );
 
