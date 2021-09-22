@@ -1,49 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Login Page</title>
-    <link rel="stylesheet" type = "text/css" href="{{ url_for ('static' , filename='css/login.css') }}">
-</head>
-
-<!--
-<div class="form-container">
-  <form action=""id = "form">
-      <h3>Login</h3>
-      <class class = "container">
-          <span class="icon"><i class="fasfa-user"></i></span>
-          <input type ="text" placeholder="username"/>
-          <div class ="container">
-              <span class="icon"><i class="fasfa-user"></i></span>
-
-          </div>
-      </class>
-
-
-
-    </form>
-
-
-
-</div>
--->
-
-
-<!-- this is my code for login -->
-
-<h1> Welcome <br>
-Login below
-
-<form action="/login" method="post">
-  <h2></h2>Username:<br>
-  <input type="text" name='username'><br>
-  Password:<br>
-  <input name='password' ><br><br>
-<input type="submit" value="Login">
-</form>
-</h1>
-<h1 >
-    {{info}}</h1>
-
-</body>
+    <head>
+        <meta charset="UTF-8">
+        <title>Login Page</title>
+        <link rel="stylesheet" type = "text/css" href="{{ url_for('static' , filename='css/login.css') }}">
+    </head>
+    <body>
+        <h1>Welcome!</h1>
+        <h2>Please sign in below.</h2>
+        <form action="/login" id="signin" method="post">
+            <div class="submission">
+                <label for="username">Username:</label><br>
+                <input type="text" placeholder="Enter username" id="username" name='username'><br>
+                <label for="password">Password:</label><br>
+                <input type="password" placeholder="Enter password" id="password" name='password'><br>
+                <input type="submit" value="Login">
+            </div><br>
+        </form>
+        <div class="alert">
+            <h2>{{info}}</h2>
+        </div>
+    </body>
 </html>
