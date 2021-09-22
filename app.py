@@ -8,7 +8,7 @@ ENV = 'prod'
 #this is for localhost
 if ENV == 'dev':
     app.debug = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:almin123@localhost/gameApp'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:almin123@localhost/flaskwebsite490'
 # this one is for the heruko
 else:
     app.debug = False
@@ -37,6 +37,7 @@ def hello_world():
 def login():
     nameIN=request.form['username']
     passwordIN=request.form['password']
+
 
     #check if username is in the accounts database
     user = accounts.query.filter_by(username=nameIN).first()
