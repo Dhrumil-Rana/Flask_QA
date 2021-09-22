@@ -1,5 +1,5 @@
 
-create table users(
+create table accounts(
 	id int NOT NULL AUTO_INCREMENT,
 	username varchar(20) not null,
 	password varchar(20) not null,
@@ -8,9 +8,9 @@ create table users(
 );
 
 INSERT INTO public.accounts(
-	username, password, role)
-	VALUES ('user', '123', 'U');
+	"userID", username, password, role)
+	VALUES (2, 'test', '$2b$12$ft2Vnpyjb1jjxXm3MMt23OMz6m2pWWN/DXaCAeR.5EgNLvxgsyBPK', 'U');
 
 INSERT INTO public.accounts(
-	username, password, role)
-	VALUES ('admin', 'admin', 'A');
+	"userID", username, password, role)
+	VALUES (1, 'admin', '$2b$12$jlLTxlabzce08gzt57JuPOwxLGwUsjxMy9SDuYjtiq5yskSHlh4NG', 'A');
