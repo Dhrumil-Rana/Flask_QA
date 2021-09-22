@@ -5,7 +5,7 @@ import bcrypt
 
 app = Flask(__name__)
 
-ENV = 'dev'
+ENV = 'prod'
 #this is for localhost
 if ENV == 'dev':
     app.debug = True
