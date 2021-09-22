@@ -7,18 +7,21 @@
     </head>
     <body>
         <h1>Welcome!</h1>
-        <h2>Please sign in below.</h2>
+        <h2>Sign in to continue.</h2>
         <form action="/login" id="signin" method="post">
             <div class="submission">
-                <label for="username">Username:</label><br>
-                <input type="text" placeholder="Enter username" id="username" name='username'><br>
-                <label for="password">Password:</label><br>
-                <input type="password" placeholder="Enter password" id="password" name='password'><br>
+                <label>Account Sign In</label><br><br>
+                <label for="username">Username</label><br>
+                <input type="text" placeholder="Enter username" id="username" name='username'><br><br>
+                <label for="password">Password</label><br>
+                <input type="password" placeholder="Enter password" id="password" name='password'><br><br><br>
                 <input type="submit" value="Login">
             </div><br>
         </form>
-        <div class="alert">
-            <h2>{{info}}</h2>
-        </div>
+        {% if info is defined and info|length %}
+            <div class="alert">
+                <h2>{{info}}</h2>
+            </div>
+        {% endif %}
     </body>
 </html>
