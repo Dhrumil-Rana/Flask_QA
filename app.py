@@ -1,7 +1,7 @@
 from flask import Flask,request,render_template
 from flask_sqlalchemy import SQLAlchemy
 import pickle
-import hashlib
+import bcrypt
 
 app = Flask(__name__)
 
@@ -49,24 +49,22 @@ def entry():
 
 @app.route('/login',methods=['POST','GET'])
 def login():
-    nameIN=request.form['username']
-    passwordIN=request.form['password'].encode('utf-8')
+    nameIN = request.form['username']
+    passwordIN = request.form['password'].encode('utf-8')
 
+    # check if username is in the accounts database
     user = accounts.query.filter_by(username=nameIN).first()
-
     if user:
-        if user.password == hashlib.sha256(passwordIN).hexdigest():
+        # compare password given to database hash
+        if bcrypt.checkpw(passwordIN, user.password.encode('utf-8')):
             if user.role == 'U':
-                user_role = 'U'
-                return render_template('home.html',name = nameIN, userlevel='user')
+                return render_template('home.html', name=nameIN, userlevel='user')
             else:
-                user_role = 'A'
                 return render_template('home.html', name=nameIN, userlevel='admin')
         else:
-            return render_template('login.html',info='Password incorrect.')
+            return render_template('login.html', info='Password incorrect.')
     else:
-         return render_template('login.html', info='Account with that username does not exist.')
-
+        return render_template('login.html', info='Account with that username does not exist.')
 
 @app.route('/home', methods=['POST', 'GET'])
 def post():
