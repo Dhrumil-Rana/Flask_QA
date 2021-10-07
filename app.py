@@ -41,7 +41,7 @@ class accounts(db.Model):
 
 
 @app.route('/')
-def hello_world():
+def entry():
     return render_template("login.html")
 
 
@@ -62,6 +62,11 @@ def login():
             return render_template('login.html',info='Password incorrect.')
     else:
          return render_template('login.html', info='Account with that username does not exist.')
+
+
+@app.route('/home', methods=['POST', 'GET'])
+def post():
+    print("here we put all the post in the home page and do all the work for database")
 
 
 if __name__ == '__main__':
