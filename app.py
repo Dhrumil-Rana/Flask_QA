@@ -66,7 +66,17 @@ def login():
 
 @app.route('/home', methods=['POST', 'GET'])
 def post():
-    print("here we put all the post in the home page and do all the work for database")
+    return "This is the home page"
+
+
+@app.route('/Friends', methods=['POST', 'GET'])
+def friend():
+    return "This is the Friends page"
+
+
+@app.route('/CreatePost', methods=['POST', 'GET'])
+def Post():
+    return "This is the create post page"
 
 
 if __name__ == '__main__':
