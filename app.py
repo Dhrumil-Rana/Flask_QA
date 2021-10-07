@@ -51,6 +51,7 @@ def login():
     passwordIN=request.form['password'].encode('utf-8')
 
     user = accounts.query.filter_by(username=nameIN).first()
+
     if user:
         if user.password == hashlib.sha256(passwordIN).hexdigest():
             if user.role == 'U':
