@@ -5,7 +5,7 @@ import bcrypt
 
 app = Flask(__name__)
 
-ENV = 'prod'
+ENV = 'dev'
 select_database = 'dhrumil'
 
 #this is for localhost
