@@ -8,6 +8,9 @@
       <li class="crumbs"><a href="/home">Home</a></li>
       <li class="crumbs"><a href="/CreatePost">Create Post</a></li>
       <li class="crumbs"><a href="/Friends">Friends</a></li>
+      {% if userlevel == 'admin' %}
+      <li class="crumbs"><a href="/AddAccount">Add User Account</a></li>
+      {% endif %}
     </ol>
   </nav>
 </header>

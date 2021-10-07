@@ -26,6 +26,7 @@ else:
 #this is general
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+user_role = 'U'
 
 class accounts(db.Model):
     __tablename__ = 'accounts'
@@ -38,6 +39,7 @@ class accounts(db.Model):
         self.username = username
         self.password = password
         self.role = role
+
 
 
 @app.route('/')
@@ -55,8 +57,10 @@ def login():
     if user:
         if user.password == hashlib.sha256(passwordIN).hexdigest():
             if user.role == 'U':
+                user_role = 'U'
                 return render_template('home.html',name = nameIN, userlevel='user')
             else:
+                user_role = 'A'
                 return render_template('home.html', name=nameIN, userlevel='admin')
         else:
             return render_template('login.html',info='Password incorrect.')
@@ -67,17 +71,24 @@ def login():
 @app.route('/home', methods=['POST', 'GET'])
 def post():
     return "This is the home page"
+# return a list of post and gian has to make a css file such that it will show in sequence
+
 
 
 @app.route('/Friends', methods=['POST', 'GET'])
 def friend():
     return "This is the Friends page"
+#return a list of all the friends
 
 
 @app.route('/CreatePost', methods=['POST', 'GET'])
 def Post():
     return "This is the create post page"
+# gian will add the post through a form post and we will take it and add it to our database
 
+
+
+# we still need to do block post and create user accounts
 
 if __name__ == '__main__':
     app.run()
