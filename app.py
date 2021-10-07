@@ -66,11 +66,11 @@ def login():
     else:
         return render_template('login.html', info='Account with that username does not exist.')
 
+
 @app.route('/home', methods=['POST', 'GET'])
 def post():
     return "This is the home page"
 # return a list of post and gian has to make a css file such that it will show in sequence
-
 
 
 @app.route('/Friends', methods=['POST', 'GET'])
@@ -85,8 +85,6 @@ def Post():
 # gian will add the post through a form post and we will take it and add it to our database
 
 
-
 # we still need to do block post and create user accounts
-
 if __name__ == '__main__':
     app.run()
