@@ -1,0 +1,28 @@
+html{
+    font-family: Georgia, serif;
+    background: black;
+    color: #ffffff;
+    text-align: center;
+}
+
+h1{
+    text-align: center;
+}
+
+.postfield input{
+    width: 30%;
+    height: 200px;
+}
+
+.postfield input[type=file]{
+    width: auto;
+    height: auto;
+}
+
+.postfield input[type=submit]{
+    height: auto;
+}
+
+textarea{
+    width: 30%;
+}
