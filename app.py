@@ -81,7 +81,7 @@ def friend():
 
 @app.route('/CreatePost', methods=['POST', 'GET'])
 def Post():
-    return "This is the create post page"
+    return render_template("createpost.html", title="Create Post")
 # gian will add the post through a form post and we will take it and add it to our database
 
 
