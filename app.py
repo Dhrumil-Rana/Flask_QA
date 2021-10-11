@@ -5,27 +5,28 @@ import bcrypt
 
 app = Flask(__name__)
 
-#change ENV to dev for local and prod for the online database
-#and change database switch to test specified database
 ENV = 'prod'
-databaseSwitch = "almin"
+select_database = 'dhrumil'
+
 #this is for localhost
 if ENV == 'dev':
     app.debug = True
-    if databaseSwitch == "almin":
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:almin123@localhost/flaskwebsite490'
+    if select_database == 'dhrumil':
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Dhrumil1998@@@localhost/gameApp'
     else:
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Dhrumil1998@@@localhost/gameapp'
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:almin123@localhost/flaskwebsite490'
 # this one is for the heruko
 else:
     app.debug = False
-    if databaseSwitch == "almin":
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://onagbacopzfapd:985b15068892b63537c9a10a74d74d6579c45f677b4cba87594a09806e78e14d@ec2-52-23-87-65.compute-1.amazonaws.com:5432/d29sd9q7h5fs67'
-    else:
+    if select_database == 'dhrumil':
         app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://wkmpqniejsynrs:cb8e4d066de141ba34aec6df0e1bc47e2d5741383d1e541a9ffb4d9a230c347a@ec2-18-209-143-227.compute-1.amazonaws.com:5432/d52kv5vd4tka5f'
+    else:
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://onagbacopzfapd:985b15068892b63537c9a10a74d74d6579c45f677b4cba87594a09806e78e14d@ec2-52-23-87-65.compute-1.amazonaws.com:5432/d29sd9q7h5fs67'
+
 #this is general
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+user_role = 'U'
 
 class accounts(db.Model):
     __tablename__ = 'accounts'
@@ -39,34 +40,51 @@ class accounts(db.Model):
         self.password = password
         self.role = role
 
+
+
 @app.route('/')
-def hello_world():
-
-    #used to generate hashed password, insert this generated hash into database without the b
-    #hashtest = bcrypt.hashpw(b'123', bcrypt.gensalt())
-    #print(hashtest)
-
+def entry():
     return render_template("login.html")
+
 
 @app.route('/login',methods=['POST','GET'])
 def login():
-    nameIN=request.form['username']
-    passwordIN=request.form['password'].encode('utf-8')
+    nameIN = request.form['username']
+    passwordIN = request.form['password'].encode('utf-8')
 
-
-    #check if username is in the accounts database
+    # check if username is in the accounts database
     user = accounts.query.filter_by(username=nameIN).first()
     if user:
-        #compare password given to database hash
-        if bcrypt.checkpw(passwordIN, user.password.encode('utf-8') ):
+        # compare password given to database hash
+        if bcrypt.checkpw(passwordIN, user.password.encode('utf-8')):
             if user.role == 'U':
-                return render_template('home.html',name = nameIN, userlevel='user')
+                return render_template('home.html', name=nameIN, userlevel='user')
             else:
                 return render_template('home.html', name=nameIN, userlevel='admin')
         else:
-            return render_template('login.html',info='Password incorrect.')
+            return render_template('login.html', info='Password incorrect.')
     else:
-         return render_template('login.html', info='Account with that username does not exist.')
+        return render_template('login.html', info='Account with that username does not exist.')
 
+
+@app.route('/home', methods=['POST', 'GET'])
+def post():
+    return "This is the home page"
+# return a list of post and gian has to make a css file such that it will show in sequence
+
+
+@app.route('/Friends', methods=['POST', 'GET'])
+def friend():
+    return "This is the Friends page"
+#return a list of all the friends
+
+
+@app.route('/CreatePost', methods=['POST', 'GET'])
+def Post():
+    return "This is the create post page"
+# gian will add the post through a form post and we will take it and add it to our database
+
+
+# we still need to do block post and create user accounts
 if __name__ == '__main__':
     app.run()

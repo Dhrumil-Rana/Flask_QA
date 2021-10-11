@@ -1,14 +1,15 @@
-<!DOCTYPE html>
-<html lang="en" class="result">
-    <head>
-        <meta charset="UTF-8">
-        <title>Home</title>
-        <link rel="stylesheet" type = "text/css" href="{{ url_for ('static' , filename='css/login.css') }}">
-    </head>
-    <body>
-        <h1>
+
+{% extends 'layout.html' %}
+
+{% block css %}
+    <link rel="stylesheet" type = "text/css" href="{{ url_for ('static' , filename='css/login.css') }}">
+{% endblock %}
+
+{% block content %}
+    <h1 class="result">
             You are signed in as: {{name}}.<br><br>
             Your access level is: {{userlevel}}
-        </h1>
-    </body>
-</html>
+    </h1>
+
+{% endblock %}
+
