@@ -14,3 +14,37 @@ INSERT INTO public.accounts(
 INSERT INTO public.accounts(
 	username, password, role)
 	VALUES ('admin', 'admin', 'A');
+
+create table posts(
+    postID int PRIMARY KEY AUTO INCREMENT,
+    userID int NOT NULL,
+    image LargeBinary,
+    text varchar(100)
+    FOREGIN KEY(userID REFERENCES users(id)
+);
+
+create table comments(
+    commentID int PRIMARY KEY AUTO INCREMENT,
+    commenterID int NOT NULL,
+    textComment varchar(100)
+);
+
+create table friends(
+    userID int NOT NULL,
+    friendID int NOT NULL
+);
+
+create table messages(
+    msgID PRIMARY KEY AUTO INCREMENT,
+    senderID int NOT NULL,
+    reciverID int NOT NULL,
+    msg varchar(100) NOT NULL
+);
+
+
+create table post(
+    post_id int NOT NULL AUTO_INCREMENT,
+    belong varchar(20) not null,
+    description varchar(),
+    image
+);
