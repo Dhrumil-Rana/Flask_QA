@@ -6,7 +6,7 @@ import bcrypt
 app = Flask(__name__)
 
 ENV = 'prod'
-select_database = 'almin'
+select_database = 'dhrumil'
 
 #this is for localhost
 if ENV == 'dev':
