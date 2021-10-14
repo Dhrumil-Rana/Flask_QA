@@ -28,7 +28,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 user_role = 'U'
 
-
 class accounts(db.Model):
     __tablename__ = 'accounts'
     userID = db.Column(db.Integer, primary_key=True)
