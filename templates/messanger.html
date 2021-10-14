@@ -1,0 +1,15 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+    <link rel="stylesheet" type = "text/css" href="{{ url_for ('static' , filename='css/post.css') }}">
+{% endblock %}
+
+{% block content %}
+    <h1 class="post">Messanger</h1>
+    <form id="sendmessage" method="post" title="Post">
+        <div class="postfield">
+            <textarea rows="2" cols="80" name="sendmessage" wrap="hard" placeholder="Enter your message to {{ friend }} here." form="sendmessage" maxlength="150"></textarea><br>
+            <input type="submit" value="Send Message">
+        </div><br>
+    </form>
+{% endblock %}

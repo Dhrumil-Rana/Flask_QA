@@ -49,8 +49,7 @@ class posts(db.Model):
     rendered_image = db.Column(db.Text, nullable=True)
     comID = db.Column(db.Integer, db.ForeignKey('comments.commentID'), nullable=False)
 
-    def __init__(self, postID, uID, image, rendered_image, comID):
-        self.postID = postID
+    def __init__(self, uID, image, rendered_image, comID):
         self.uID = uID
         self.image = image
         self.rendered_image = rendered_image
@@ -64,8 +63,7 @@ class comments(db.Model):
     textComment = db.Column(db.VARCHAR(), nullable=False)
     postID = db.Column(db.Integer, db.ForeignKey(posts.postID), nullable=False)
 
-    def __init__(self, commentID, commenterID, textComment, postID):
-        self.commentID = commentID
+    def __init__(self, commenterID, textComment, postID):
         self.commenterID = commenterID
         self.textComment = textComment
         self.postID = postID
@@ -87,8 +85,7 @@ class message(db.Model):
     receiverID = db.Column(db.Integer, nullable=False)
     msg = db.Column(db.VARCHAR, nullable=False)
 
-    def __init__(self, msgID, senderID, receiverID, msg):
-        self.msgID = msgID
+    def __init__(self, senderID, receiverID, msg):
         self.senderID = senderID
         self.receiverID = receiverID
         self.msg = msg
@@ -130,8 +127,36 @@ def post():
 
 @app.route('/Friends', methods=['POST', 'GET'])
 def friend():
-    return "This is the Friends page"
+    #getting userid then getting friends and filling friendlist
+    user= db.session.query(accounts.userID).filter_by(username=session.get('name')).first()
+    friendIDlist=db.session.query(friends.friendID).filter_by(userID=user)
+    friendlist = []
+    for friendID in friendIDlist:
+        f = db.session.query(accounts.username).filter_by(userID=friendID).first()
+        friendlist.append(f)
+    # getting userid then getting friends and filling friendlist
+    print(friendlist)
+    return render_template("friends.html",friends=friendlist, title="Friends", name=session.get('name'), userlevel=session.get('userlevel') )
 #return a list of all the friends
+
+@app.route('/messanger/<friendname>', methods=['POST', 'GET'])
+def messanger(friendname):
+    sender = session.get('name')
+    friendsID = db.session.query(accounts.userID).filter_by(username=friendname).first()  #receiver
+    usersID = db.session.query(accounts.userID).filter_by(username=session.get('name')).first() #sender or current user
+
+    sentmsgs = db.session.query(message.msgID,message.msg).filter_by(senderID=usersID,receiverID=friendsID).all() #msgs sent by the current user to friend
+    receivedmsgs = db.session.query(message.msgID,message.msg).filter_by(senderID=friendsID,receiverID=usersID).all() #msgs sent by friend to current user
+
+    if request.method == 'POST':
+        msgToSend = request.form['sendmessage']
+        messageSEND = message(msg=msgToSend, senderID=usersID, receiverID=friendsID)
+        db.session.add(messageSEND)
+        db.session.commit()
+        return render_template("messanger.html", title="Messanger", msgsSent=sentmsgs, msgsReceived=receivedmsgs, friend=friendname, name = session.get('name'), userlevel = session.get('userlevel') )
+
+    if request.method == 'GET':
+        return render_template("messanger.html", title="Messanger", msgsSent=sentmsgs, msgsReceived=receivedmsgs, friend=friendname, name=session.get('name'), userlevel=session.get('userlevel') )
 
 
 @app.route('/CreatePost', methods=['POST', 'GET'])
@@ -155,7 +180,7 @@ def addaccount():
         return newpassword
 
     if request.method == 'GET':
-        return render_template("addaccount.html", title="Create Post", name=session.get('name'),userlevel=session.get('userlevel'))
+        return render_template("addaccount.html", title="Add Account", name=session.get('name'),userlevel=session.get('userlevel'))
 
 
 # we still need to do block post and create user accounts
