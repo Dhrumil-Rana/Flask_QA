@@ -57,6 +57,7 @@ class posts(db.Model):
         self.rendered_image = rendered_image
         self.comID = comID
 
+
 class comments(db.Model):
     __tablename__ = 'comments'
     commentID = db.column(db.Integer, primary_key=True)
