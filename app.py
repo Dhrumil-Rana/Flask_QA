@@ -44,11 +44,11 @@ class accounts(db.Model):
 
 class posts(db.Model):
     __tablename__ = 'posts'
-    postID = db.column(db.Integer, primary_key=True)
-    uID = db.column(db.Integer, db.ForeignKey('accounts.userID'), nullabel=False, on_delete=models.CASCADE)
-    image = db.column(db.LargeBinary, nullable=True)
-    rendered_image = db.column(db.Text, nullable=True)
-    comID = db.column(db.Integer, db.ForeignKey('comments.commentID'), nullable=False, on_delete=models.CASCADE)
+    postID = db.Column(db.Integer, primary_key=True)
+    uID = db.Column(db.Integer, db.ForeignKey('accounts.userID'), nullable=False)
+    image = db.Column(db.LargeBinary, nullable=True)
+    rendered_image = db.Column(db.Text, nullable=True)
+    comID = db.Column(db.Integer, db.ForeignKey('comments.commentID'), nullable=False)
 
     def __init__(self, postID, uID, image, rendered_image, comID):
         self.postID = postID
@@ -60,10 +60,10 @@ class posts(db.Model):
 
 class comments(db.Model):
     __tablename__ = 'comments'
-    commentID = db.column(db.Integer, primary_key=True)
-    commenterID = db.column(db.Integer, db.ForeignKey('accounts.userID'), nullable=False, on_delete=models.CASCADE)
-    textComment = db.column(db.VARChar(), nullable=False)
-    postID = db.column(db.Integer, db.ForeignKey(posts.postID), nullable=False, on_delete=models.CASCADE)
+    commentID = db.Column(db.Integer, primary_key=True)
+    commenterID = db.Column(db.Integer, db.ForeignKey('accounts.userID'), nullable=False)
+    textComment = db.Column(db.VARCHAR(), nullable=False)
+    postID = db.Column(db.Integer, db.ForeignKey(posts.postID), nullable=False)
 
     def __init__(self, commentID, commenterID, textComment, postID):
         self.commentID = commentID
@@ -73,8 +73,9 @@ class comments(db.Model):
 
 class friends(db.Model):
     __tablename__ = 'friends'
-    userID = db.column(db.Integer)
-    friendID = db.column(db.Integer, db.ForeignKey('accounts.userID'), nullable=False, on_delete=models.CASCADE)
+    Number = db.Column(db.Integer, primary_key=True)
+    userID = db.Column(db.Integer)
+    friendID = db.Column(db.Integer, db.ForeignKey('accounts.userID'), nullable=False)
 
     def __init__(self, userID, friendID):
         self.userID = userID
@@ -82,10 +83,10 @@ class friends(db.Model):
 
 class message(db.Model):
     __tablename__ = 'message'
-    msgID = db.column(db.Integer, primary_key=True)
-    senderID = db.column(db.Integer, nullable=False)
-    receiverID = db.column(db.Integer, nullable=False)
-    msg = db.column(db.VARCHAR, nullable=False)
+    msgID = db.Column(db.Integer, primary_key=True)
+    senderID = db.Column(db.Integer, nullable=False)
+    receiverID = db.Column(db.Integer, nullable=False)
+    msg = db.Column(db.VARCHAR, nullable=False)
 
     def __init__(self, msgID, senderID, receiverID, msg):
         self.msgID = msgID
