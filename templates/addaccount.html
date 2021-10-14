@@ -1,0 +1,29 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+    <link rel="stylesheet" type = "text/css" href="{{ url_for ('static' , filename='css/post.css') }}">
+{% endblock %}
+
+{% block content %}
+    <head>
+        <meta charset="UTF-8">
+        <title>Login Page</title>
+        <link rel="stylesheet" type = "text/css" href="{{ url_for('static' , filename='css/login.css') }}">
+    </head>
+    <h1 class="post">Add Account</h1>
+    <form action="/AddAccount" id="addaccount" method="post" title="AddAccount">
+            <div class="submission">
+                <label>Add a new account</label><br><br>
+                <label for="username">Username</label><br>
+                <input type="text" placeholder="Enter username" id="username" name='username'><br><br>
+                <label for="password">Password</label><br>
+                <input type="password" placeholder="Enter password" id="password" name='password'><br><br><br>
+                <input type="submit" value="Add Account">
+            </div><br>
+        </form>
+        {% if info is defined and info|length %}
+            <div class="alert">
+                <h2>{{info}}</h2>
+            </div>
+        {% endif %}
+{% endblock %}

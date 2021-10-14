@@ -1,9 +1,32 @@
-.crumbs ol {
+.bar ul{
     list-style-type: none;
-    padding-left: 0;
+    margin: 0;
+    width: 100%;
+    padding: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+    background-color: #d8bd15;
 }
 
-.crumb {
+.bar ul li{
+    float: left;
+}
+
+.bar ul li a{
+    display: block;
+    color: #000000;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+.bar ul li a:hover{
+    background-color: #7a690e;
+}
+
+.bar{
     display: inline-block;
 }
 

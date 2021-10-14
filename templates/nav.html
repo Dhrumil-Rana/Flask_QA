@@ -3,14 +3,14 @@
 </head>
 
 <header>
-  <nav class="crumbs">
-    <ol>
-      <li class="crumbs"><a href="/home">Home</a></li>
-      <li class="crumbs"><a href="/CreatePost">Create Post</a></li>
-      <li class="crumbs"><a href="/Friends">Friends</a></li>
+  <nav class="bar">
+    <ul>
+      <li class="bar"><a href="/home">Home</a></li>
+      <li class="bar"><a href="/CreatePost">Create Post</a></li>
+      <li class="bar"><a href="/Friends">Friends</a></li>
       {% if userlevel == 'admin' %}
-      <li class="crumbs"><a href="/AddAccount">Add User Account</a></li>
+      <li class="bar"><a href="/AddAccount">Add User Account</a></li>
       {% endif %}
-    </ol>
+    </ul>
   </nav>
 </header>

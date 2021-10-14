@@ -1,4 +1,4 @@
-from flask import Flask,request,render_template
+from flask import Flask,request,render_template,session
 from flask_sqlalchemy import SQLAlchemy
 import pickle
 import bcrypt
@@ -25,6 +25,7 @@ else:
 
 #this is general
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.secret_key='very secret key'
 db = SQLAlchemy(app)
 user_role = 'U'
 
@@ -107,8 +108,12 @@ def login():
         # compare password given to database hash
         if bcrypt.checkpw(passwordIN, user.password.encode('utf-8')):
             if user.role == 'U':
+                session['name']=request.form['username']
+                session['userlevel']="user"
                 return render_template('home.html', name=nameIN, userlevel='user')
             else:
+                session['name']=request.form['username']
+                session['userlevel'] = 'admin'
                 return render_template('home.html', name=nameIN, userlevel='admin')
         else:
             return render_template('login.html', info='Password incorrect.')
@@ -118,7 +123,7 @@ def login():
 
 @app.route('/home', methods=['POST', 'GET'])
 def post():
-    return "This is the home page"
+    return render_template('home.html',name=session.get('name'), userlevel=session.get('userlevel'))
 # return a list of post and gian has to make a css file such that it will show in sequence
 
 
@@ -130,8 +135,18 @@ def friend():
 
 @app.route('/CreatePost', methods=['POST', 'GET'])
 def Post():
-    return "This is the create post page"
+    if request.method == 'POST':
+        return "sent"
+    if request.method == 'GET':
+        return render_template("createpost.html", title="Create Post",name=session.get('name'), userlevel=session.get('userlevel'))
+
 # gian will add the post through a form post and we will take it and add it to our database
+@app.route('/AddAccount', methods=['POST', 'GET'])
+def addaccount():
+    if request.method == 'POST':
+        return "sent"
+    if request.method == 'GET':
+        return render_template("addaccount.html", title="Create Post", name=session.get('name'),userlevel=session.get('userlevel'))
 
 
 # we still need to do block post and create user accounts

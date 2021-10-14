@@ -1,0 +1,21 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+    <link rel="stylesheet" type = "text/css" href="{{ url_for ('static' , filename='css/post.css') }}">
+{% endblock %}
+
+{% block content %}
+    <h1 class="post">Create Post</h1>
+*Still need to implement rich text so the buttons actually work*<br>
+    <button type="button">B</button>
+    <button type="button">I</button>
+    <button type="button">U</button>
+    <form id="userpost" method="POST" title="Post" action="/CreatePost">
+        <div class="postfield">
+            <textarea rows="4" cols="80" name="usertext" wrap="hard" placeholder="Enter your thoughts here." form="userpost" maxlength="200"></textarea><br>
+            <label for="img">Attach image:</label>
+            <input type="file" id="img" name="img" accept=".png, .jpg"><br>
+            <input type="submit" value="Post">
+        </div><br>
+    </form>
+{% endblock %}
