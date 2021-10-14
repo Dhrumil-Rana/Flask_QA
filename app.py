@@ -45,16 +45,12 @@ class posts(db.Model):
     __tablename__ = 'posts'
     postID = db.Column(db.Integer, primary_key=True)
     uID = db.Column(db.Integer, db.ForeignKey('accounts.userID'), nullable=False)
-    image = db.Column(db.LargeBinary, nullable=True)
     rendered_image = db.Column(db.Text, nullable=True)
-    comID = db.Column(db.Integer, db.ForeignKey('comments.commentID'), nullable=False)
+    description = db.Column(db.VARCHAR, nullable=True)
 
-    def __init__(self, postID, uID, image, rendered_image, comID):
-        self.postID = postID
-        self.uID = uID
-        self.image = image
+    def __init__(self, rendered_image, description):
         self.rendered_image = rendered_image
-        self.comID = comID
+        self.description = description
 
 
 class comments(db.Model):
@@ -64,8 +60,7 @@ class comments(db.Model):
     textComment = db.Column(db.VARCHAR(), nullable=False)
     postID = db.Column(db.Integer, db.ForeignKey(posts.postID), nullable=False)
 
-    def __init__(self, commentID, commenterID, textComment, postID):
-        self.commentID = commentID
+    def __init__(self, commenterID, textComment, postID):
         self.commenterID = commenterID
         self.textComment = textComment
         self.postID = postID
@@ -87,8 +82,7 @@ class message(db.Model):
     receiverID = db.Column(db.Integer, nullable=False)
     msg = db.Column(db.VARCHAR, nullable=False)
 
-    def __init__(self, msgID, senderID, receiverID, msg):
-        self.msgID = msgID
+    def __init__(self, senderID, receiverID, msg):
         self.senderID = senderID
         self.receiverID = receiverID
         self.msg = msg
@@ -137,9 +131,25 @@ def friend():
 @app.route('/CreatePost', methods=['POST', 'GET'])
 def Post():
     if request.method == 'POST':
-        return "sent"
+        usertext = request.form['usertext']
+        image = request.files['img']
+        if not image:
+            return "No File Found"
+        '''
+        if bold.checked:
+            usertext = "<b>"+usertext+"<b>"
+        if italic:
+            usertext = "<i>"+usertext+"<i>"
+        if underline:
+            usertext = "<u>"+usertext+"<u>"
+        '''
+
+        post = posts(rendered_image=image.read(), description=usertext)
+        db.session.add(post)
+        db.session.commit()
+        return render_template("home.html", title="Home", name=session.get('name'), userlevel=session.get('userlevel'))
     if request.method == 'GET':
-        return render_template("createpost.html", title="Create Post",name=session.get('name'), userlevel=session.get('userlevel'))
+        return render_template("createpost.html", title="Create Post", name=session.get('name'), userlevel=session.get('userlevel'))
 
 # gian will add the post through a form post and we will take it and add it to our database
 @app.route('/AddAccount', methods=['POST', 'GET'])
