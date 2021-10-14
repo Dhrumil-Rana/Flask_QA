@@ -6,7 +6,7 @@ import bcrypt
 app = Flask(__name__)
 
 ENV = 'prod'
-select_database = 'dhrumil'
+select_database = 'almin'
 
 #this is for localhost
 if ENV == 'dev':
@@ -27,7 +27,6 @@ else:
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key='very secret key'
 db = SQLAlchemy(app)
-user_role = 'U'
 
 class accounts(db.Model):
     __tablename__ = 'accounts'
@@ -41,6 +40,18 @@ class accounts(db.Model):
         self.password = password
         self.role = role
 
+class posts(db.Model):
+    __tablename__ = 'posts'
+    postID = db.Column(db.Integer, primary_key=True)
+    userID = db.Column(db.Integer)
+    description = db.Column(db.VARCHAR())
+    image = db.Column(db.LargeBinary)
+
+    def __init__(self, postID, userID, description, image):
+        self.postID = postID
+        self.userID = userID
+        self.description = description
+        self.image = image
 
 
 @app.route('/')
@@ -95,7 +106,15 @@ def Post():
 @app.route('/AddAccount', methods=['POST', 'GET'])
 def addaccount():
     if request.method == 'POST':
-        return "sent"
+        newuserName = request.form['username']
+        passIN = request.form['password']
+        newrole = request.form['role']
+        newpassword = bcrypt.hashpw(passIN.encode('utf-8'), bcrypt.gensalt())
+        user = accounts(username= newuserName, password=newpassword.decode('utf-8'), role=newrole)
+        db.session.add(user)
+        db.session.commit()
+        return newpassword
+
     if request.method == 'GET':
         return render_template("addaccount.html", title="Create Post", name=session.get('name'),userlevel=session.get('userlevel'))
 
