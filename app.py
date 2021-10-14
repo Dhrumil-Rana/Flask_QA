@@ -47,6 +47,7 @@ class posts(db.Model):
     uID = db.column(db.Integer, db.ForeignKey('accounts.userID'), nullabel=False)
     image = db.column(db.LargeBinary, nullable=True)
     rendered_image = db.column(db.Text, nullable=True)
+    comID = db.column(db.Integer, db.ForeignKey('comments.commentID'), nullable=False)
 
 
 class comments(db.Model):
@@ -54,7 +55,7 @@ class comments(db.Model):
     commentID = db.column(db.Integer, primary_key=True)
     commenterID = db.column(db.Integer, db.ForeignKey('accounts.userID'), nullable=False)
     textComment = db.column(db.VARChar(), nullable=False)
-
+    postID = db.column(db.Integer, db.ForeignKey(posts.postID), nullable=False)
 
 class friends(db.Model):
     __tablename__ = 'friends'
