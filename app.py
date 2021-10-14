@@ -40,18 +40,6 @@ class accounts(db.Model):
         self.password = password
         self.role = role
 
-class posts(db.Model):
-    __tablename__ = 'posts'
-    postID = db.Column(db.Integer, primary_key=True)
-    userID = db.Column(db.Integer)
-    description = db.Column(db.VARCHAR())
-    image = db.Column(db.LargeBinary)
-
-    def __init__(self, postID, userID, description, image):
-        self.postID = postID
-        self.userID = userID
-        self.description = description
-        self.image = image
 
 class posts(db.Model):
     __tablename__ = 'posts'
