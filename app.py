@@ -44,24 +44,39 @@ class accounts(db.Model):
 class posts(db.Model):
     __tablename__ = 'posts'
     postID = db.column(db.Integer, primary_key=True)
-    uID = db.column(db.Integer, db.ForeignKey('accounts.userID'), nullabel=False)
+    uID = db.column(db.Integer, db.ForeignKey('accounts.userID'), nullabel=False, on_delete=models.CASCADE)
     image = db.column(db.LargeBinary, nullable=True)
     rendered_image = db.column(db.Text, nullable=True)
-    comID = db.column(db.Integer, db.ForeignKey('comments.commentID'), nullable=False)
+    comID = db.column(db.Integer, db.ForeignKey('comments.commentID'), nullable=False, on_delete=models.CASCADE)
 
+    def __init__(self, postID, uID, image, rendered_image, comID):
+        self.postID = postID
+        self.uID = uID
+        self.image = image
+        self.rendered_image = rendered_image
+        self.comID = comID
 
 class comments(db.Model):
     __tablename__ = 'comments'
     commentID = db.column(db.Integer, primary_key=True)
-    commenterID = db.column(db.Integer, db.ForeignKey('accounts.userID'), nullable=False)
+    commenterID = db.column(db.Integer, db.ForeignKey('accounts.userID'), nullable=False, on_delete=models.CASCADE)
     textComment = db.column(db.VARChar(), nullable=False)
-    postID = db.column(db.Integer, db.ForeignKey(posts.postID), nullable=False)
+    postID = db.column(db.Integer, db.ForeignKey(posts.postID), nullable=False, on_delete=models.CASCADE)
+
+    def __init__(self, commentID, commenterID, textComment, postID):
+        self.commentID = commentID
+        self.commenterID = commenterID
+        self.textComment = textComment
+        self.postID = postID
 
 class friends(db.Model):
     __tablename__ = 'friends'
     userID = db.column(db.Integer)
-    friendID = db.column(db.Integer, db.ForeignKey('accounts.userID'), nullable=False)
+    friendID = db.column(db.Integer, db.ForeignKey('accounts.userID'), nullable=False, on_delete=models.CASCADE)
 
+    def __init__(self, userID, friendID):
+        self.userID = userID
+        self.friendID = friendID
 
 class message(db.Model):
     __tablename__ = 'message'
@@ -70,13 +85,18 @@ class message(db.Model):
     receiverID = db.column(db.Integer, nullable=False)
     msg = db.column(db.VARCHAR, nullable=False)
 
+    def __init__(self, msgID, senderID, receiverID, msg):
+        self.msgID = msgID
+        self.senderID = senderID
+        self.receiverID = receiverID
+        self.msg = msg
 
 @app.route('/')
 def entry():
     return render_template("login.html")
 
 
-@app.route('/login',methods=['POST','GET'])
+@app.route('/login',methods=['POST', 'GET'])
 def login():
     nameIN = request.form['username']
     passwordIN = request.form['password'].encode('utf-8')
