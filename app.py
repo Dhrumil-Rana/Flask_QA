@@ -28,6 +28,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 user_role = 'U'
 
+
 class accounts(db.Model):
     __tablename__ = 'accounts'
     userID = db.Column(db.Integer, primary_key=True)
@@ -40,6 +41,34 @@ class accounts(db.Model):
         self.password = password
         self.role = role
 
+
+class posts(db.Model):
+    __tablename__ = 'posts'
+    postID = db.column(db.Integer, primary_key=True)
+    uID = db.column(db.Integer, db.ForeignKey('accounts.userID'), nullabel=False)
+    image = db.column(db.LargeBinary, nullable=True)
+    rendered_image = db.column(db.Text, nullable=True)
+
+
+class comments(db.Model):
+    __tablename__ = 'comments'
+    commentID = db.column(db.Integer, primary_key=True)
+    commenterID = db.column(db.Integer, db.ForeignKey('accounts.userID'), nullable=False)
+    textComment = db.column(db.VARChar(), nullable=False)
+
+
+class friends(db.Model):
+    __tablename__ = 'friends'
+    userID = db.column(db.Integer)
+    friendID = db.column(db.Integer, db.ForeignKey('accounts.userID'), nullable=False)
+
+
+class message(db.Model):
+    __tablename__ = 'message'
+    msgID = db.column(db.Integer, primary_key=True)
+    senderID = db.column(db.Integer, nullable=False)
+    receiverID = db.column(db.Integer, nullable=False)
+    msg = db.column(db.VARCHAR, nullable=False)
 
 
 @app.route('/')

@@ -41,10 +41,3 @@ create table messages(
     msg varchar(100) NOT NULL
 );
 
-
-create table post(
-    post_id int NOT NULL AUTO_INCREMENT,
-    belong varchar(20) not null,
-    description varchar(),
-    image
-);
