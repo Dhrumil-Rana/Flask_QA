@@ -48,7 +48,8 @@ class posts(db.Model):
     rendered_image = db.Column(db.Text, nullable=True)
     description = db.Column(db.VARCHAR, nullable=True)
 
-    def __init__(self, rendered_image, description):
+    def __init__(self,uID, rendered_image, description):
+        self.uID = uID
         self.rendered_image = rendered_image
         self.description = description
 
@@ -135,16 +136,9 @@ def Post():
         image = request.files['img']
         if not image:
             return "No File Found"
-        '''
-        if bold.checked:
-            usertext = "<b>"+usertext+"<b>"
-        if italic:
-            usertext = "<i>"+usertext+"<i>"
-        if underline:
-            usertext = "<u>"+usertext+"<u>"
-        '''
-
-        post = posts(rendered_image=image.read(), description=usertext)
+        account = accounts.query.filter_by(username=session.get('name')).first()
+        userid = account.userID
+        post = posts(uID=userid, rendered_image=image.read(), description=usertext)
         db.session.add(post)
         db.session.commit()
         return render_template("home.html", title="Home", name=session.get('name'), userlevel=session.get('userlevel'))
@@ -159,7 +153,7 @@ def addaccount():
         passIN = request.form['password']
         newrole = request.form['role']
         newpassword = bcrypt.hashpw(passIN.encode('utf-8'), bcrypt.gensalt())
-        user = accounts(username= newuserName, password=newpassword.decode('utf-8'), role=newrole)
+        user = accounts(username=newuserName, password=newpassword.decode('utf-8'), role=newrole)
         db.session.add(user)
         db.session.commit()
         return newpassword
