@@ -1,8 +1,10 @@
-from flask import Flask,request,render_template,session,Response, url_for
+from flask import Flask,request,render_template,session,Response, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 import pickle
+import urllib.request
 import bcrypt
 from werkzeug.utils import secure_filename
+import os
 
 app = Flask(__name__)
 
@@ -24,10 +26,20 @@ else:
     else:
         app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://onagbacopzfapd:985b15068892b63537c9a10a74d74d6579c45f677b4cba87594a09806e78e14d@ec2-52-23-87-65.compute-1.amazonaws.com:5432/d29sd9q7h5fs67'
 
+
 #this is general
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key='very secret key'
 db = SQLAlchemy(app)
+
+#this is saving post detail
+UPLOAD_FOLDER = 'static/upload/'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 class accounts(db.Model):
     __tablename__ = 'accounts'
@@ -139,16 +151,20 @@ def Post():
     if request.method == 'POST':
         usertext = request.form['usertext']
         image = request.files['img']
-        filename = secure_filename(image.filename)
-        mimetype = image.mimetype
-        if not filename or not mimetype:
-            return 'Bad upload!', 400
+        if allowed_file(image.filename):
+            filename = secure_filename(image.filename)
+            image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            mimetype = image.mimetype
+        else:
+            flash('Allowed image types are - png, jpg, jpeg, gif')
+            return redirect(request.url)
+
         account = accounts.query.filter_by(username=session.get('name')).first()
         userid = account.userID
         post = posts(uID=userid,image=image.read(), description=usertext, filename=filename, mimetype=mimetype)
         db.session.add(post)
         db.session.commit()
-        return render_template("viewpost.html", title="Home", name=session.get('name'), userlevel=session.get('userlevel'))
+        return render_template("createpost.html", title="Home", name=session.get('name'), userlevel=session.get('userlevel'), filename=filename )
     if request.method == 'GET':
         return render_template("createpost.html", title="Create Post", name=session.get('name'), userlevel=session.get('userlevel'))
 
@@ -167,11 +183,6 @@ def addaccount():
 
     if request.method == 'GET':
         return render_template("addaccount.html", title="Create Post", name=session.get('name'),userlevel=session.get('userlevel'))
-
-@app.route('/<int:id>')
-def get_img(id):
-    img = posts.query.filter_by(postID=id).first()
-    return Response(img.image, mimetype=img.mimetype, filename=filename)
 
 
 # we still need to do block post and create user accounts

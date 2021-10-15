@@ -12,8 +12,8 @@
     </head>
     <br>
     {% for image in post %}
-    <p>{{image.rendered_image}}</p>
-    <img src="{{image.rendered_image}}" />
+    <p>{{image.filename}}</p>
+    <img src="{{image.filename}}" />
     {% endfor %}
 
 {% endblock %}}
