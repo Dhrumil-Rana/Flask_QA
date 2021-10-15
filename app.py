@@ -1,7 +1,8 @@
-from flask import Flask,request,render_template,session
+from flask import Flask,request,render_template,session,Response, url_for
 from flask_sqlalchemy import SQLAlchemy
 import pickle
 import bcrypt
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
@@ -45,13 +46,17 @@ class posts(db.Model):
     __tablename__ = 'posts'
     postID = db.Column(db.Integer, primary_key=True)
     uID = db.Column(db.Integer, db.ForeignKey('accounts.userID'), nullable=False)
-    rendered_image = db.Column(db.Text, nullable=True)
+    image = db.Column(db.Text, nullable=True)
     description = db.Column(db.VARCHAR, nullable=True)
+    filename = db.Column(db.Text, nullable=True)
+    mimetype = db.Column(db.Text, nullable=True)
 
-    def __init__(self,uID, rendered_image, description):
+    def __init__(self,uID, image, description, filename, mimetype):
         self.uID = uID
-        self.rendered_image = rendered_image
+        self.image = image
         self.description = description
+        self.filename = filename
+        self.mimetype = mimetype
 
 
 class comments(db.Model):
@@ -134,14 +139,16 @@ def Post():
     if request.method == 'POST':
         usertext = request.form['usertext']
         image = request.files['img']
-        if not image:
-            return "No File Found"
+        filename = secure_filename(image.filename)
+        mimetype = image.mimetype
+        if not filename or not mimetype:
+            return 'Bad upload!', 400
         account = accounts.query.filter_by(username=session.get('name')).first()
         userid = account.userID
-        post = posts(uID=userid, rendered_image=image.read(), description=usertext)
+        post = posts(uID=userid,image=image.read(), description=usertext, filename=filename, mimetype=mimetype)
         db.session.add(post)
         db.session.commit()
-        return render_template("home.html", title="Home", name=session.get('name'), userlevel=session.get('userlevel'))
+        return render_template("viewpost.html", title="Home", name=session.get('name'), userlevel=session.get('userlevel'))
     if request.method == 'GET':
         return render_template("createpost.html", title="Create Post", name=session.get('name'), userlevel=session.get('userlevel'))
 
@@ -160,6 +167,11 @@ def addaccount():
 
     if request.method == 'GET':
         return render_template("addaccount.html", title="Create Post", name=session.get('name'),userlevel=session.get('userlevel'))
+
+@app.route('/<int:id>')
+def get_img(id):
+    img = posts.query.filter_by(postID=id).first()
+    return Response(img.image, mimetype=img.mimetype, filename=filename)
 
 
 # we still need to do block post and create user accounts
