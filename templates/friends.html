@@ -1,0 +1,12 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+    <link rel="stylesheet" type = "text/css" href="{{ url_for ('static' , filename='css/post.css') }}">
+{% endblock %}
+
+{% block content %}
+    <h1>Friends:</h1>
+    {% for fr in friends %}
+        <h1><a href="/messanger/{{ fr[0] }}">{{ fr[0] }}</a></h1>
+    {% endfor %}
+{% endblock %}
