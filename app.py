@@ -192,6 +192,4 @@ def addaccount():
 
 # we still need to do block post and create user accounts
 if __name__ == '__main__':
-    jebemtibog = db.session.query(message).delete()
-    db.session.commit()
     app.run(debug=True)
