@@ -4,8 +4,18 @@
     <link rel="stylesheet" type = "text/css" href="{{ url_for ('static' , filename='css/post.css') }}">
 {% endblock %}
 
+
 {% block content %}
-    <h1 class="post">Messanger</h1>
+    <h1 class="post">Chat with: {{ friend }}</h1>
+
+    {% for msg in msgsALL %}
+        {% if msg[2] == sendersID %}
+            <h1> You : {{ msg[1] }}</h1>
+        {% else %}
+            <h1>{{ friend }} : {{ msg[1] }}</h1>
+        {% endif %}
+
+    {% endfor %}
     <form id="sendmessage" method="post" title="Post">
         <div class="postfield">
             <textarea rows="2" cols="80" name="sendmessage" wrap="hard" placeholder="Enter your message to {{ friend }} here." form="sendmessage" maxlength="150"></textarea><br>
