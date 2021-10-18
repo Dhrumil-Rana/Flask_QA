@@ -1,21 +1,21 @@
 {% extends 'layout.html' %}
 
 {% block css %}
-    <link rel="stylesheet" type = "text/css" href="{{ url_for ('static' , filename='css/post.css') }}">
+    <link rel="stylesheet" type = "text/css" href="{{ url_for ('static' , filename='css/messenger.css') }}">
 {% endblock %}
 
 
 {% block content %}
     <h1 class="post">Chat with: {{ friend }}</h1>
-
+    <div class="messagelist">
     {% for msg in msgsALL %}
         {% if msg[2] == sendersID %}
-            <h1> You : {{ msg[1] }}</h1>
+            <div class="usermsg"><h2> You : {{ msg[1] }}</h2></div>
         {% else %}
-            <h1>{{ friend }} : {{ msg[1] }}</h1>
+            <div class="friendmsg"><h2>{{ friend }} : {{ msg[1] }}</h2></div>
         {% endif %}
-
     {% endfor %}
+    </div><br>
     <form id="sendmessage" method="post" title="Post">
         <div class="postfield">
             <textarea rows="2" cols="80" name="sendmessage" wrap="hard" placeholder="Enter your message to {{ friend }} here." form="sendmessage" maxlength="150"></textarea><br>

@@ -1,0 +1,32 @@
+html{
+    font-family: Georgia, serif;
+    background: black;
+    color: #ffffff;
+    text-align: center;
+}
+
+h1{
+    text-align: center;
+}
+
+h2{
+    text-align: left;
+}
+
+.messagelist{
+    margin: auto;
+    width: 75%;
+    word-break: break-word;
+    overflow: auto;
+    background: gray;
+    border: 1px solid #f6ff00;
+}
+
+.usermsg{
+    background: gray;
+    height: 30px;
+}
+
+.friendmsg{
+    background: gray;
+}
