@@ -9,6 +9,7 @@
         <input type="text" placeholder="Search...">
         <button type="submit">Submit</button>
     </div>
+    <!--
     <h1 class="result">
             You are signed in as: {{name}}.<br><br>
             Your access level is: {{userlevel}}
@@ -17,7 +18,10 @@
     {% for post in posts %}
         <center><img src="{{ url_for('static', filename='upload/'+post.filename) }}" width="900" height="600"/></center>
         <br>
-
+        <div class="addcomment">
+            <input type="comment" placeholder="Add a comment...">
+            <button type="submit">Add comment</button>
+        </div>
         {% for comment in comments %}}
             {% if comment.id == post.id %}
                 <p>comment.textComment</p>

@@ -145,7 +145,43 @@ def home():
 
 @app.route('/Friends', methods=['POST', 'GET'])
 def friend():
-    return "This is the Friends page"
+    #getting userid then getting friends and filling friendlist
+    user= db.session.query(accounts.userID).filter_by(username=session.get('name')).first()
+    friendIDlist=db.session.query(friends.friendID).filter_by(userID=user)
+    friendlist = []
+    for friendID in friendIDlist:
+        f = db.session.query(accounts.username).filter_by(userID=friendID).first()
+        friendlist.append(f)
+    # getting userid then getting friends and filling friendlist
+    print(friendlist)
+    return render_template("friends.html",friends=friendlist, title="Friends", name=session.get('name'), userlevel=session.get('userlevel') )
+#return a list of all the friends
+
+
+@app.route('/messanger/<friendname>', methods=['GET', 'POST'])
+def messanger(friendname):
+    msgToSend = ''
+    sender = session.get('name')
+    friendsID = db.session.query(accounts.userID).filter_by(username=friendname).first()  #receiver
+    usersID = db.session.query(accounts.userID).filter_by(username=session.get('name')).first() #sender or current user
+    sentmsgs = db.session.query(message.msgID,message.msg,message.senderID).filter_by(senderID=usersID,receiverID=friendsID).all() #msgs sent by the current user to friend
+    receivedmsgs = db.session.query(message.msgID,message.msg,message.senderID).filter_by(senderID=friendsID,receiverID=usersID).all() #msgs sent by friend to current user
+    allmsgs = sentmsgs + receivedmsgs
+    allmsgs.sort()
+    print(allmsgs)
+
+    if request.method == 'GET':
+        return render_template("messanger.html", title="Messanger", msgsALL=allmsgs, msgsSent=sentmsgs, msgsReceived=receivedmsgs, sendersID=usersID[0], friend=friendname, name=session.get('name'), userlevel=session.get('userlevel'))
+
+    if request.method == 'POST':
+        msgToSend = request.form['sendmessage']
+        if msgToSend != '':
+            messageSEND = message(msg=msgToSend, senderID=usersID, receiverID=friendsID)
+            msgToSend = ''
+            db.session.add(messageSEND)
+            db.session.commit()
+
+        return redirect(url_for("messanger", title="Messanger", msgsALL=allmsgs, msgsSent=sentmsgs, msgsReceived=receivedmsgs, sendersID=usersID[0],friend=friendname, friendname=friendname, name=session.get('name'), userlevel=session.get('userlevel')))
 
 
 

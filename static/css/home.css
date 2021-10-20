@@ -17,3 +17,8 @@ h1{
 .search button{
     padding: 6px 10px;
 }
+
+.addcomment{
+    margin: auto;
+    text-align: center;
+}
