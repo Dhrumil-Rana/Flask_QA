@@ -64,7 +64,7 @@ class posts(db.Model):
     description = db.Column(db.VARCHAR, nullable=True)
     filename = db.Column(db.Text, nullable=True)
     mimetype = db.Column(db.Text, nullable=True)
-    blocked = db.Column(db.Text, nullable=False,default="false")
+    blocked = db.Column(db.Text, nullable=False)
 
     def __init__(self,uID, image, description, filename, mimetype, blocked):
         self.uID = uID
