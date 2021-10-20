@@ -1,9 +1,12 @@
-from flask import Flask,request,render_template,session,redirect,url_for
+from flask import Flask,request,render_template,session,redirect,url_for,flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO, send, emit, ConnectionRefusedError, join_room
 import pickle
 import eventlet
 import bcrypt
+import urllib.request
+from werkzeug.utils import secure_filename
+import os
 
 app = Flask(__name__)
 socketio = SocketIO(app, engineio_logger=True, cors_allowed_origins="*")
@@ -31,6 +34,15 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key='very secret key'
 db = SQLAlchemy(app)
 
+#this is saving post detail
+UPLOAD_FOLDER = 'static/upload/'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 class accounts(db.Model):
     __tablename__ = 'accounts'
     userID = db.Column(db.Integer, primary_key=True)
@@ -48,15 +60,19 @@ class posts(db.Model):
     __tablename__ = 'posts'
     postID = db.Column(db.Integer, primary_key=True)
     uID = db.Column(db.Integer, db.ForeignKey('accounts.userID'), nullable=False)
-    image = db.Column(db.LargeBinary, nullable=True)
-    rendered_image = db.Column(db.Text, nullable=True)
-    comID = db.Column(db.Integer, db.ForeignKey('comments.commentID'), nullable=False)
+    image = db.Column(db.Text, nullable=True)
+    description = db.Column(db.VARCHAR, nullable=True)
+    filename = db.Column(db.Text, nullable=True)
+    mimetype = db.Column(db.Text, nullable=True)
+    blocked = db.Column(db.Text, nullable=False,default="false")
 
-    def __init__(self, uID, image, rendered_image, comID):
+    def __init__(self,uID, image, description, filename, mimetype, blocked):
         self.uID = uID
         self.image = image
-        self.rendered_image = rendered_image
-        self.comID = comID
+        self.description = description
+        self.filename = filename
+        self.mimetype = mimetype
+        self.blocked = blocked
 
 
 class comments(db.Model):
@@ -163,9 +179,25 @@ def messanger(name, friendname):
 @app.route('/CreatePost', methods=['POST', 'GET'])
 def Post():
     if request.method == 'POST':
-        return "sent"
+        usertext = request.form['usertext']
+        image = request.files['img']
+        if allowed_file(image.filename):
+            filename = secure_filename(image.filename)
+            image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            mimetype = image.mimetype
+            blocked = "false"
+        else:
+            flash('Allowed image types are - png, jpg, jpeg, gif')
+            return redirect(request.url)
+
+        account = accounts.query.filter_by(username=session.get('name')).first()
+        userid = account.userID
+        post = posts(uID=userid,image=image.read(), description=usertext, filename=filename, mimetype=mimetype, blocked=blocked)
+        db.session.add(post)
+        db.session.commit()
+        return render_template("createpost.html", title="Home", name=session.get('name'), userlevel=session.get('userlevel'), filename=filename )
     if request.method == 'GET':
-        return render_template("createpost.html", title="Create Post",name=session.get('name'), userlevel=session.get('userlevel'))
+        return render_template("createpost.html", title="Create Post", name=session.get('name'), userlevel=session.get('userlevel'))
 
 # gian will add the post through a form post and we will take it and add it to our database
 @app.route('/AddAccount', methods=['POST', 'GET'])
