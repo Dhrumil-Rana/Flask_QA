@@ -10,11 +10,17 @@
             Your access level is: {{userlevel}}
     </h1>
     {% for post in posts %}
-        <center><img src="{{ url_for('static', filename='upload/'+post.filename) }}" width="900" height="600"/></center>
+        <center><img src="{{ url_for('static', filename='upload/'+post.filename) }}" width="300" height="200"/></center>
+        <center><h6><p style="color:white";>{{post.description}}</p></h6></center>
+        <center><form id="sendcomment" >
+            <input type="text" id="comment" placeholder="Comment on post">
+            <button type="submit">Send</button>
+        </form>
+        </center>
         <br>
 
         {% for comment in comments %}}
-            {% if comment.id == post.id %}
+            {% if comment.postID == post.postID %}
                 <p>comment.textComment</p>
             {% endif %}
         {% endfor %}

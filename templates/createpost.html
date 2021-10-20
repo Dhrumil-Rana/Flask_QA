@@ -2,20 +2,27 @@
 
 {% block css %}
     <link rel="stylesheet" type = "text/css" href="{{ url_for ('static' , filename='css/post.css') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 {% endblock %}
 
 {% block content %}
     <h1 class="post">Create Post</h1>
 *Still need to implement rich text so the buttons actually work*<br>
-    <button type="button">B</button>
-    <button type="button">I</button>
-    <button type="button">U</button>
-    <form id="userpost" method="post" title="Post">
+
+    <form id="userpost" enctype="multipart/form-data" method="post" title="Post">
+            <input type = "checkbox" name = "bold" value = "B"> B
+            <input type = "checkbox" name = "italic" value = "I"> I
+            <input type = "checkbox" name = "underline" value = "U"> U
         <div class="postfield">
-            <textarea rows="4" cols="80" name="usertext" wrap="hard" placeholder="Enter your thoughts here." form="userpost" maxlength="200"></textarea><br>
+            <textarea rows="4" cols="80" name="usertext" wrap="hard" placeholder="Enter your thoughts here." form="userpost"></textarea><br>
             <label for="img">Attach image:</label>
             <input type="file" id="img" name="img" accept=".png, .jpg, .jpeg"><br>
-            <input type="submit" value="Post">
+            {% if filename %}
+            <div>
+            <img src="{{ url_for('static', filename='upload/'+filename) }}" width="193" height="130">
+            </div>
+            {% endif %}
+            <input type="submit" value="Post" onclick = "alert('Thanks for Post {{name}}')">
         </div><br>
     </form>
 {% endblock %}
