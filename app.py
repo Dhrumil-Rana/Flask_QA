@@ -1,9 +1,12 @@
 from flask import Flask,request,render_template,session,redirect,url_for
 from flask_sqlalchemy import SQLAlchemy
+from flask_socketio import SocketIO, send, emit, ConnectionRefusedError, join_room
 import pickle
+import eventlet
 import bcrypt
 
 app = Flask(__name__)
+socketio = SocketIO(app, engineio_logger=True, cors_allowed_origins="*")
 
 ENV = 'prod'
 select_database = 'almin'
@@ -140,8 +143,8 @@ def friend():
 #return a list of all the friends
 
 
-@app.route('/messanger/<friendname>', methods=['GET', 'POST'])
-def messanger(friendname):
+@app.route('/messanger/<name>/<friendname>', methods=['GET'])
+def messanger(name, friendname):
     msgToSend = ''
     sender = session.get('name')
     friendsID = db.session.query(accounts.userID).filter_by(username=friendname).first()  #receiver
@@ -153,17 +156,8 @@ def messanger(friendname):
     print(allmsgs)
 
     if request.method == 'GET':
-        return render_template("messanger.html", title="Messanger", msgsALL=allmsgs, msgsSent=sentmsgs, msgsReceived=receivedmsgs, sendersID=usersID[0], friend=friendname, name=session.get('name'), userlevel=session.get('userlevel'))
+        return render_template("messanger.html", title="Messanger", msgsALL=allmsgs, msgsSent=sentmsgs, msgsReceived=receivedmsgs, sendersID=usersID[0], friend=friendname, friendID=friendsID[0], name=session.get('name'), userlevel=session.get('userlevel'))
 
-    if request.method == 'POST':
-        msgToSend = request.form['sendmessage']
-        if msgToSend != '':
-            messageSEND = message(msg=msgToSend, senderID=usersID, receiverID=friendsID)
-            msgToSend = ''
-            db.session.add(messageSEND)
-            db.session.commit()
-
-        return redirect(url_for("messanger", title="Messanger", msgsALL=allmsgs, msgsSent=sentmsgs, msgsReceived=receivedmsgs, sendersID=usersID[0],friend=friendname, friendname=friendname, name=session.get('name'), userlevel=session.get('userlevel')))
 
 
 @app.route('/CreatePost', methods=['POST', 'GET'])
@@ -190,6 +184,28 @@ def addaccount():
         return render_template("addaccount.html", title="Add Account", name=session.get('name'),userlevel=session.get('userlevel'))
 
 
+@socketio.on("joined")
+def handle_event_joined(data):
+    #new room is a room which the user joins when they select a friend to receive messages from and send to
+    newRoom = data['userID'] +":" + data['friendID']  #the room is only for this user, not the friend
+    print(newRoom)
+    join_room(newRoom)
+    print(data)
+
+@socketio.on("sendMessage")
+def handle_sendMessage_event(data):
+
+    #adding message to the database
+    messageSEND = message(msg=data['message'], senderID=data['userID'], receiverID=data['friendID'])
+    db.session.add(messageSEND)
+    db.session.commit()
+
+    #sending message to the friends receiving room for our user
+    sendToRoom = data['friendID'] + ":" + data['userID']
+    socketio.emit('receiveMessage',data,room=sendToRoom)
+    print("sending to: "+sendToRoom)
+    print(data)
+
 # we still need to do block post and create user accounts
 if __name__ == '__main__':
-    app.run(debug=True)
+    socketio.run(app, debug=True)

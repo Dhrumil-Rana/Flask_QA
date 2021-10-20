@@ -7,6 +7,6 @@
 {% block content %}
     <h1>Friends:</h1>
     {% for fr in friends %}
-        <h1><a href="/messanger/{{ fr[0] }}">{{ fr[0] }}</a></h1>
+        <h1><a href="/messanger/{{ name }}/{{ fr[0] }}">{{ fr[0] }}</a></h1>
     {% endfor %}
 {% endblock %}
