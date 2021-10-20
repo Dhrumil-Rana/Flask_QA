@@ -1,0 +1,38 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+    <link rel="stylesheet" type = "text/css" href="{{ url_for ('static' , filename='css/search.css') }}">
+{% endblock %}
+
+{% block content %}
+    {% if users %}
+        <h3>Users Found:</h3>
+        {% for user in users %}
+            <h6>{{user.username}}</h6>
+        {% endfor %}
+    {%  else %}
+        <h2>No users found by the name: {{search_txt}}</h2>
+    {% endif %}
+    {% if posts %}
+        <h2>Posts found:</h2>
+        {% for post in posts %}
+            <center><img src="{{ url_for('static', filename='upload/'+post.filename) }}" width="600" /></center>
+                   <center><h6><p style="color:white";>{{post.description}}</p></h6></center>
+            <br>
+            <div class="addcomment">
+                <center>
+                <input type="comment" placeholder="Add a comment...">
+                <button type="submit">Add comment</button>
+                </center>
+            </div>
+            {% for comment in comments %}}
+                {% if comment.id == post.id %}
+                    <p>comment.textComment</p>
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+    {% else %}
+        <h2>No posts found by the description: {{search_txt}}</h2>
+    {% endif %}
+
+{% endblock %}

@@ -185,6 +185,13 @@ def addaccount():
     if request.method == 'GET':
         return render_template("addaccount.html", title="Create Post", name=session.get('name'),userlevel=session.get('userlevel'))
 
+@app.route('/search', methods=['POST', 'GET'])
+def search():
+    src = request.form['search']
+    resulted_post = posts.query.filter_by(description=src).all()
+    resulted_users = accounts.query.filter_by(username=src).all()
+    return render_template("search.html", posts=resulted_post, users=resulted_users, search_txt=src)
+
 
 # we still need to do block post and create user accounts
 if __name__ == '__main__':
