@@ -141,13 +141,12 @@ def home():
         comment = comments.query.all()
 
         return render_template('home.html',name=session.get('name'), userlevel=session.get('userlevel'), posts=post, comments=comment)
-# return a list of post and gian has to make a css file such that it will show in sequence
 
 
 @app.route('/Friends', methods=['POST', 'GET'])
 def friend():
     return "This is the Friends page"
-#return a list of all the friends
+
 
 
 @app.route('/CreatePost', methods=['POST', 'GET'])
