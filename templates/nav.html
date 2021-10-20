@@ -9,8 +9,15 @@
       <li class="bar"><a href="/CreatePost">Create Post</a></li>
       <li class="bar"><a href="/Friends">Friends</a></li>
       {% if userlevel == 'admin' %}
-      <li class="bar"><a href="/AddAccount">Add User Account</a></li>
+          <li class="bar"><a href="/AddAccount">Add User Account</a></li>
+          <li class="bar"><a href="/blockedPosts">Blocked Posts</a></li>
       {% endif %}
+        <li class="bar">
+            <form action="/search" method="post">
+            <input type="text" name="search" id ="search" placeholder="Search...">
+            <button type="submit">Submit</button>
+            </form>
+        </li>
     </ul>
   </nav>
 </header>

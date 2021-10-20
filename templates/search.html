@@ -1,0 +1,65 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+    <link rel="stylesheet" type = "text/css" href="{{ url_for ('static' , filename='css/search.css') }}">
+{% endblock %}
+
+{% block content %}
+    {% if users %}
+        <h3>Users Found:</h3>
+        {% for user in users %}
+            <h6>{{user.username}}</h6>
+        {% endfor %}
+    {%  else %}
+        <h2>No users found by the name: {{search_txt}}</h2>
+    {% endif %}
+    {% if posts %}
+        <h2>Posts found:</h2>
+        <div id="postlist" class="postlist">
+        {% for post in posts %}
+            {% if post.blocked=='false' %}
+                {% for user in everuser %}
+                    {% if user.role=='A' %}
+                        <center><form id="blockpost" method="post" >
+                            <input type="hidden" id="postID" name="postID" value="{{ post.postID }}">
+                            <input type="hidden" id="block" name="block">
+                            <button type="submit">Block Post</button>
+                        </form></center>
+                    {% endif %}
+                    {% if post.uID == user.userID %}
+                        <center><h2><p style="color:black";>Posted by: {{user.username}}</p></h2></center>
+                    {% endif %}
+                {% endfor %}
+                <center><img src="{{ url_for('static', filename='upload/'+post.filename) }}" width="300" height="200"/></center>
+                <center><h6><p style="color:black";>{{post.description}}</p></h6></center>
+
+                <center><div id="commentlist"  class="commentlist">
+                {% for comment in comments %}
+                    {% if comment.postID == post.postID %}
+                        {% for user in everyuser %}
+                            {% if comment.commenterID==user.userID %}
+                                <div class="comments"><h6><p>{{ user.username }} commented: {{ comment.textComment }}</p></h6></div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
+                </div>
+                </center>
+
+                <center><form id="sendcomment" method="post" >
+                    <input type="text" id="comment_input" name="comment_input" placeholder="Comment on post">
+                    <input type="hidden" id="comment" name="comment">
+                    <input type="hidden" id="searchtxt" name="searchtxt" value="{{ search_txt }}">
+                    <input type="hidden" id="postID" name="postID" value="{{ post.postID }}">
+                    <button type="submit">Send</button>
+                </form>
+                </center>
+                <br>
+             {% endif %}
+        {% endfor %}
+        </div>
+    {% else %}
+        <h2>No posts found by the description: {{search_txt}}</h2>
+    {% endif %}
+
+{% endblock %}
