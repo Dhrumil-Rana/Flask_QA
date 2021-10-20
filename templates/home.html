@@ -9,21 +9,37 @@
             You are signed in as: {{name}}.<br><br>
             Your access level is: {{userlevel}}
     </h1>
+    <div id="postlist" class="postlist">
     {% for post in posts %}
+        {% for user in users %}
+            {% if post.uID == user.userID %}
+                <center><h6><p style="color:white";>Posted by: {{user.username}}</p></h6></center>
+            {% endif %}
+        {% endfor %}
         <center><img src="{{ url_for('static', filename='upload/'+post.filename) }}" width="300" height="200"/></center>
         <center><h6><p style="color:white";>{{post.description}}</p></h6></center>
-        <center><form id="sendcomment" >
-            <input type="text" id="comment" placeholder="Comment on post">
+
+        <center><div id="commentlist"  class="commentlist">
+        {% for comment in comments %}
+            {% if comment.postID == post.postID %}
+                {% for user in users %}
+                    {% if comment.commenterID==user.userID %}
+                        <div class="comments"><h6><p>{{ user.username }} commented: {{ comment.textComment }}</p></h6></div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+        </div>
+        </center>
+
+        <center><form id="sendcomment" method="post" >
+            <input type="text" id="comment_input" name="comment_input" placeholder="Comment on post">
+            <input type="hidden" id="postID" name="postID" value="{{ post.postID }}">
             <button type="submit">Send</button>
         </form>
         </center>
         <br>
-
-        {% for comment in comments %}}
-            {% if comment.postID == post.postID %}
-                <p>comment.textComment</p>
-            {% endif %}
-        {% endfor %}
     {% endfor %}
+    </div>
 
 {% endblock %}
