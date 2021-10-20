@@ -260,6 +260,25 @@ def addaccount():
     if request.method == 'GET':
         return render_template("addaccount.html", title="Add Account", name=session.get('name'),userlevel=session.get('userlevel'))
 
+@app.route('/search', methods=['POST', 'GET'])
+def search():
+    if 'comment' in request.form:
+        userID = db.session.query(accounts.userID).filter_by(username=session.get('name')).first()
+        commenttext = request.form['comment_input']
+        postID = request.form['postID']
+        commentSEND = comments(textComment=commenttext, commenterID=userID, postID=postID)
+        db.session.add(commentSEND)
+        db.session.commit()
+        return redirect("home")
+    if 'search' in request.form:
+        src = request.form['search']
+        resulted_post = posts.query.filter_by(description=src).all()
+        resulted_users = accounts.query.filter_by(username=src).all()
+        resulted_comments = comments.query.all()
+        allusers = accounts.query.all()
+        print(resulted_comments)
+    return render_template("search.html", posts=resulted_post, users=resulted_users, everyuser=allusers, search_txt=src, comments=resulted_comments,name=session.get('name'), userlevel=session.get('userlevel'))
+
 #socketio events
 @socketio.on("joined")
 def handle_event_joined(data):
