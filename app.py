@@ -135,8 +135,12 @@ def login():
 
 
 @app.route('/home', methods=['POST', 'GET'])
-def post():
-    return render_template('home.html',name=session.get('name'), userlevel=session.get('userlevel'))
+def home():
+    if request.method == 'GET':
+        post = posts.query.all()
+        comment = comments.query.all()
+
+        return render_template('home.html',name=session.get('name'), userlevel=session.get('userlevel'), posts=post, comments=comment)
 # return a list of post and gian has to make a css file such that it will show in sequence
 
 
@@ -180,7 +184,6 @@ def addaccount():
         db.session.add(user)
         db.session.commit()
         return newpassword
-
     if request.method == 'GET':
         return render_template("addaccount.html", title="Create Post", name=session.get('name'),userlevel=session.get('userlevel'))
 

@@ -5,10 +5,21 @@
 {% endblock %}
 
 {% block content %}
+    <!--
     <h1 class="result">
             You are signed in as: {{name}}.<br><br>
             Your access level is: {{userlevel}}
     </h1>
+    -->
+    {% for post in posts %}
+        <center><img src="{{ url_for('static', filename='upload/'+post.filename) }}" width="900" height="600"/></center>
+        <br>
+        {% for comment in comments %}}
+            {% if comment.id == post.id %}
+                <p>comment.textComment</p>
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
 
 {% endblock %}
 
