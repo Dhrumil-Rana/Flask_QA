@@ -1,12 +1,15 @@
-from flask import Flask,request,render_template,session,redirect,url_for
+from flask import Flask,request,render_template,session,Response, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 import pickle
+import urllib.request
 import bcrypt
+from werkzeug.utils import secure_filename
+import os
 
 app = Flask(__name__)
 
 ENV = 'prod'
-select_database = 'almin'
+select_database = 'dhrumil'
 
 #this is for localhost
 if ENV == 'dev':
@@ -23,10 +26,20 @@ else:
     else:
         app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://onagbacopzfapd:985b15068892b63537c9a10a74d74d6579c45f677b4cba87594a09806e78e14d@ec2-52-23-87-65.compute-1.amazonaws.com:5432/d29sd9q7h5fs67'
 
+
 #this is general
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key='very secret key'
 db = SQLAlchemy(app)
+
+#this is saving post detail
+UPLOAD_FOLDER = 'static/upload/'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 class accounts(db.Model):
     __tablename__ = 'accounts'
@@ -45,15 +58,17 @@ class posts(db.Model):
     __tablename__ = 'posts'
     postID = db.Column(db.Integer, primary_key=True)
     uID = db.Column(db.Integer, db.ForeignKey('accounts.userID'), nullable=False)
-    image = db.Column(db.LargeBinary, nullable=True)
-    rendered_image = db.Column(db.Text, nullable=True)
-    comID = db.Column(db.Integer, db.ForeignKey('comments.commentID'), nullable=False)
+    image = db.Column(db.Text, nullable=True)
+    description = db.Column(db.VARCHAR, nullable=True)
+    filename = db.Column(db.Text, nullable=True)
+    mimetype = db.Column(db.Text, nullable=True)
 
-    def __init__(self, uID, image, rendered_image, comID):
+    def __init__(self,uID, image, description, filename, mimetype):
         self.uID = uID
         self.image = image
-        self.rendered_image = rendered_image
-        self.comID = comID
+        self.description = description
+        self.filename = filename
+        self.mimetype = mimetype
 
 
 class comments(db.Model):
@@ -120,58 +135,41 @@ def login():
 
 
 @app.route('/home', methods=['POST', 'GET'])
-def post():
-    return render_template('home.html',name=session.get('name'), userlevel=session.get('userlevel'))
-# return a list of post and gian has to make a css file such that it will show in sequence
+def home():
+    if request.method == 'GET':
+        post = posts.query.all()
+        comment = comments.query.all()
+
+        return render_template('home.html',name=session.get('name'), userlevel=session.get('userlevel'), posts=post, comments=comment)
 
 
 @app.route('/Friends', methods=['POST', 'GET'])
 def friend():
-    #getting userid then getting friends and filling friendlist
-    user= db.session.query(accounts.userID).filter_by(username=session.get('name')).first()
-    friendIDlist=db.session.query(friends.friendID).filter_by(userID=user)
-    friendlist = []
-    for friendID in friendIDlist:
-        f = db.session.query(accounts.username).filter_by(userID=friendID).first()
-        friendlist.append(f)
-    # getting userid then getting friends and filling friendlist
-    print(friendlist)
-    return render_template("friends.html",friends=friendlist, title="Friends", name=session.get('name'), userlevel=session.get('userlevel') )
-#return a list of all the friends
+    return "This is the Friends page"
 
-
-@app.route('/messanger/<friendname>', methods=['GET', 'POST'])
-def messanger(friendname):
-    msgToSend = ''
-    sender = session.get('name')
-    friendsID = db.session.query(accounts.userID).filter_by(username=friendname).first()  #receiver
-    usersID = db.session.query(accounts.userID).filter_by(username=session.get('name')).first() #sender or current user
-    sentmsgs = db.session.query(message.msgID,message.msg,message.senderID).filter_by(senderID=usersID,receiverID=friendsID).all() #msgs sent by the current user to friend
-    receivedmsgs = db.session.query(message.msgID,message.msg,message.senderID).filter_by(senderID=friendsID,receiverID=usersID).all() #msgs sent by friend to current user
-    allmsgs = sentmsgs + receivedmsgs
-    allmsgs.sort()
-    print(allmsgs)
-
-    if request.method == 'GET':
-        return render_template("messanger.html", title="Messanger", msgsALL=allmsgs, msgsSent=sentmsgs, msgsReceived=receivedmsgs, sendersID=usersID[0], friend=friendname, name=session.get('name'), userlevel=session.get('userlevel'))
-
-    if request.method == 'POST':
-        msgToSend = request.form['sendmessage']
-        if msgToSend != '':
-            messageSEND = message(msg=msgToSend, senderID=usersID, receiverID=friendsID)
-            msgToSend = ''
-            db.session.add(messageSEND)
-            db.session.commit()
-
-        return redirect(url_for("messanger", title="Messanger", msgsALL=allmsgs, msgsSent=sentmsgs, msgsReceived=receivedmsgs, sendersID=usersID[0],friend=friendname, friendname=friendname, name=session.get('name'), userlevel=session.get('userlevel')))
 
 
 @app.route('/CreatePost', methods=['POST', 'GET'])
 def Post():
     if request.method == 'POST':
-        return "sent"
+        usertext = request.form['usertext']
+        image = request.files['img']
+        if allowed_file(image.filename):
+            filename = secure_filename(image.filename)
+            image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            mimetype = image.mimetype
+        else:
+            flash('Allowed image types are - png, jpg, jpeg, gif')
+            return redirect(request.url)
+
+        account = accounts.query.filter_by(username=session.get('name')).first()
+        userid = account.userID
+        post = posts(uID=userid,image=image.read(), description=usertext, filename=filename, mimetype=mimetype)
+        db.session.add(post)
+        db.session.commit()
+        return render_template("createpost.html", title="Home", name=session.get('name'), userlevel=session.get('userlevel'), filename=filename )
     if request.method == 'GET':
-        return render_template("createpost.html", title="Create Post",name=session.get('name'), userlevel=session.get('userlevel'))
+        return render_template("createpost.html", title="Create Post", name=session.get('name'), userlevel=session.get('userlevel'))
 
 # gian will add the post through a form post and we will take it and add it to our database
 @app.route('/AddAccount', methods=['POST', 'GET'])
@@ -181,15 +179,14 @@ def addaccount():
         passIN = request.form['password']
         newrole = request.form['role']
         newpassword = bcrypt.hashpw(passIN.encode('utf-8'), bcrypt.gensalt())
-        user = accounts(username= newuserName, password=newpassword.decode('utf-8'), role=newrole)
+        user = accounts(username=newuserName, password=newpassword.decode('utf-8'), role=newrole)
         db.session.add(user)
         db.session.commit()
-        return render_template("addaccount.html", title="Add Account", name=session.get('name'),userlevel=session.get('userlevel'))
-
+        return newpassword
     if request.method == 'GET':
-        return render_template("addaccount.html", title="Add Account", name=session.get('name'),userlevel=session.get('userlevel'))
+        return render_template("addaccount.html", title="Create Post", name=session.get('name'),userlevel=session.get('userlevel'))
 
 
 # we still need to do block post and create user accounts
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
