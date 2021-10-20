@@ -127,11 +127,11 @@ def login():
             if user.role == 'U':
                 session['name']=request.form['username']
                 session['userlevel']="user"
-                return render_template('home.html', name=nameIN, userlevel='user')
+                return redirect(url_for('home'))
             else:
                 session['name']=request.form['username']
                 session['userlevel'] = 'admin'
-                return render_template('home.html', name=nameIN, userlevel='admin')
+                return redirect(url_for('home'))
         else:
             return render_template('login.html', info='Password incorrect.')
     else:
@@ -142,9 +142,21 @@ def login():
 def home():
     if request.method == 'GET':
         post = posts.query.all()
-        comment = comments.query.all()
+        commentlist = comments.query.all()
+        user = accounts.query.all()
 
-        return render_template('home.html',name=session.get('name'), userlevel=session.get('userlevel'), posts=post, comments=comment)
+        return render_template('home.html',name=session.get('name'), userlevel=session.get('userlevel'), posts=post, comments=commentlist,users=user)
+    if request.method =='POST':
+        post = posts.query.all()
+        commentlist = comments.query.all()
+        user = accounts.query.all()
+        userID = db.session.query(accounts.userID).filter_by(username=session.get('name')).first()
+        commenttext=request.form['comment_input']
+        postID=request.form['postID']
+        commentSEND = comments(textComment=commenttext, commenterID=userID, postID=postID)
+        db.session.add(commentSEND)
+        db.session.commit()
+        return redirect('home')
 # return a list of post and gian has to make a css file such that it will show in sequence
 
 
@@ -219,7 +231,7 @@ def addaccount():
     if request.method == 'GET':
         return render_template("addaccount.html", title="Add Account", name=session.get('name'),userlevel=session.get('userlevel'))
 
-
+#socketio events
 @socketio.on("joined")
 def handle_event_joined(data):
     #new room is a room which the user joins when they select a friend to receive messages from and send to
