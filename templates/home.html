@@ -12,9 +12,9 @@
     </h1>
     -->
     {% for post in posts %}
-        <center><img src="{{ url_for('static', filename='upload/'+post.filename) }}" width="900" height="600"/></center>
+        <center><img src="{{ url_for('static', filename='upload/'+post.filename) }}" width="600" /></center>
+               <center><h6><p style="color:white";>{{post.description}}</p></h6></center>
         <br>
-
         {% for comment in comments %}}
             {% if comment.id == post.id %}
                 <p>comment.textComment</p>

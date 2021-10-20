@@ -1,4 +1,4 @@
-from flask import Flask,request,render_template,session,Response, url_for, flash
+from flask import Flask,request,render_template,session,url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 import pickle
 import urllib.request
@@ -35,7 +35,6 @@ db = SQLAlchemy(app)
 #this is saving post detail
 UPLOAD_FOLDER = 'static/upload/'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 
 def allowed_file(filename):
@@ -62,14 +61,15 @@ class posts(db.Model):
     description = db.Column(db.VARCHAR, nullable=True)
     filename = db.Column(db.Text, nullable=True)
     mimetype = db.Column(db.Text, nullable=True)
+    blocked = db.Column(db.Text, nullable=False)
 
-    def __init__(self,uID, image, description, filename, mimetype):
+    def __init__(self,uID, image, description, filename, mimetype,blocked):
         self.uID = uID
         self.image = image
         self.description = description
         self.filename = filename
         self.mimetype = mimetype
-
+        self.blocked = blocked
 
 class comments(db.Model):
     __tablename__ = 'comments'
@@ -156,13 +156,14 @@ def Post():
             filename = secure_filename(image.filename)
             image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             mimetype = image.mimetype
+            blocked = "false"
         else:
-            flash('Allowed image types are - png, jpg, jpeg, gif')
+            flash('Allowed image types are - png, jpg, jpeg')
             return redirect(request.url)
 
         account = accounts.query.filter_by(username=session.get('name')).first()
         userid = account.userID
-        post = posts(uID=userid,image=image.read(), description=usertext, filename=filename, mimetype=mimetype)
+        post = posts(uID=userid,image=image.read(), description=usertext, filename=filename, mimetype=mimetype, blocked=blocked)
         db.session.add(post)
         db.session.commit()
         return render_template("createpost.html", title="Home", name=session.get('name'), userlevel=session.get('userlevel'), filename=filename )
