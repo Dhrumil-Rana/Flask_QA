@@ -7,9 +7,10 @@
 {% block content %}
     <h1 class="post">Create Post</h1>
 *Still need to implement rich text so the buttons actually work*<br>
-    <button type="button">B</button>
-    <button type="button">I</button>
-    <button type="button">U</button>
+    <input type="radio" name="richtext" id="bold" value="Bold">Bold</input>
+    <input type="radio" name="richtext" id="italics" value="Italics">Italics</input>
+    <input type="radio" name="richtext" id="underline" value="Underline">Underline</input>
+    <input type="radio" name="richtext" value="None">None</input>
     <form id="userpost" method="post" title="Post">
         <div class="postfield">
             <textarea rows="4" cols="80" name="usertext" wrap="hard" placeholder="Enter your thoughts here." form="userpost" maxlength="200"></textarea><br>
