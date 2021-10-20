@@ -137,6 +137,26 @@ def login():
     else:
         return render_template('login.html', info='Account with that username does not exist.')
 
+@app.route('/blockedPosts', methods=['POST', 'GET'])
+def blockedPosts():
+    if request.method=='GET':
+        post = posts.query.all()
+        commentlist = comments.query.all()
+        user = accounts.query.all()
+        return render_template('blockedposts.html', name=session.get('name'), userlevel=session.get('userlevel'), posts=post,
+                               comments=commentlist, users=user)
+    if request.method =='POST':
+        if 'unblock' in request.form:
+            blockpostID=request.form['postID']
+            print("unblocking post"+ blockpostID)
+            blockpost = posts.query.filter_by(postID=blockpostID).first()
+            blockpost.blocked = 'false'
+            db.session.commit()
+
+        post = posts.query.all()
+        commentlist = comments.query.all()
+        user = accounts.query.all()
+        return (redirect('blockedPosts'))
 
 @app.route('/home', methods=['POST', 'GET'])
 def home():
@@ -147,15 +167,24 @@ def home():
 
         return render_template('home.html',name=session.get('name'), userlevel=session.get('userlevel'), posts=post, comments=commentlist,users=user)
     if request.method =='POST':
+        if 'block' in request.form:
+            blockpostID=request.form['postID']
+            print("blocking post"+ blockpostID)
+            blockpost = posts.query.filter_by(postID=blockpostID).first()
+            blockpost.blocked = 'true'
+            db.session.commit()
+
         post = posts.query.all()
         commentlist = comments.query.all()
         user = accounts.query.all()
-        userID = db.session.query(accounts.userID).filter_by(username=session.get('name')).first()
-        commenttext=request.form['comment_input']
-        postID=request.form['postID']
-        commentSEND = comments(textComment=commenttext, commenterID=userID, postID=postID)
-        db.session.add(commentSEND)
-        db.session.commit()
+
+        if 'comment' in request.form:
+            userID = db.session.query(accounts.userID).filter_by(username=session.get('name')).first()
+            commenttext=request.form['comment_input']
+            postID=request.form['postID']
+            commentSEND = comments(textComment=commenttext, commenterID=userID, postID=postID)
+            db.session.add(commentSEND)
+            db.session.commit()
         return redirect('home')
 # return a list of post and gian has to make a css file such that it will show in sequence
 
