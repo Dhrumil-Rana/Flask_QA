@@ -1,6 +1,7 @@
 from flask import Flask,request,render_template,session,redirect,url_for,flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO, send, emit, ConnectionRefusedError, join_room
+from functools import wraps
 import pickle
 import eventlet
 import bcrypt
@@ -109,35 +110,59 @@ class message(db.Model):
         self.receiverID = receiverID
         self.msg = msg
 
+def login_required(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'logged_in' in session:
+            return f(*args, **kwargs)
+        else:
+            flash('You need to login first')
+            return redirect(url_for('login'))
+    return wrap
+
 @app.route('/')
 def entry():
     return render_template("login.html")
 
+@app.route('/logout')
+@login_required
+def logout():
+    session.pop('logged_in', None)
+    session.pop('name', None)
+    session.pop('userlevel', None)
+    return redirect(url_for('login'))
+
 
 @app.route('/login',methods=['POST', 'GET'])
 def login():
-    nameIN = request.form['username']
-    passwordIN = request.form['password'].encode('utf-8')
+    if request.method=='POST':
+        nameIN = request.form['username']
+        passwordIN = request.form['password'].encode('utf-8')
 
-    # check if username is in the accounts database
-    user = accounts.query.filter_by(username=nameIN).first()
-    if user:
-        # compare password given to database hash
-        if bcrypt.checkpw(passwordIN, user.password.encode('utf-8')):
-            if user.role == 'U':
-                session['name']=request.form['username']
-                session['userlevel']="user"
-                return redirect(url_for('home'))
+        # check if username is in the accounts database
+        user = accounts.query.filter_by(username=nameIN).first()
+        if user:
+            # compare password given to database hash
+            if bcrypt.checkpw(passwordIN, user.password.encode('utf-8')):
+                if user.role == 'U':
+                    session['logged_in']=True
+                    session['name']=request.form['username']
+                    session['userlevel']="user"
+                    return redirect(url_for('home'))
+                else:
+                    session['logged_in'] = True
+                    session['name']=request.form['username']
+                    session['userlevel'] = 'admin'
+                    return redirect(url_for('home'))
             else:
-                session['name']=request.form['username']
-                session['userlevel'] = 'admin'
-                return redirect(url_for('home'))
+                return render_template('login.html', info='Password incorrect.')
         else:
-            return render_template('login.html', info='Password incorrect.')
-    else:
-        return render_template('login.html', info='Account with that username does not exist.')
+            return render_template('login.html', info='Account with that username does not exist.')
+    if request.method=='GET':
+        return render_template('login.html')
 
 @app.route('/blockedPosts', methods=['POST', 'GET'])
+@login_required
 def blockedPosts():
     if request.method=='GET':
         post = posts.query.all()
@@ -159,6 +184,7 @@ def blockedPosts():
         return (redirect('blockedPosts'))
 
 @app.route('/home', methods=['POST', 'GET'])
+@login_required
 def home():
     if request.method == 'GET':
         post = posts.query.all()
@@ -190,6 +216,7 @@ def home():
 
 
 @app.route('/Friends', methods=['POST', 'GET'])
+@login_required
 def friend():
     #getting userid then getting friends and filling friendlist
     user= db.session.query(accounts.userID).filter_by(username=session.get('name')).first()
@@ -205,6 +232,7 @@ def friend():
 
 
 @app.route('/messanger/<name>/<friendname>', methods=['GET'])
+@login_required
 def messanger(name, friendname):
     msgToSend = ''
     sender = session.get('name')
@@ -222,6 +250,7 @@ def messanger(name, friendname):
 
 
 @app.route('/CreatePost', methods=['POST', 'GET'])
+@login_required
 def Post():
     if request.method == 'POST':
         usertext = request.form['usertext']
@@ -246,6 +275,7 @@ def Post():
 
 # gian will add the post through a form post and we will take it and add it to our database
 @app.route('/AddAccount', methods=['POST', 'GET'])
+@login_required
 def addaccount():
     if request.method == 'POST':
         newuserName = request.form['username']
@@ -261,6 +291,7 @@ def addaccount():
         return render_template("addaccount.html", title="Add Account", name=session.get('name'),userlevel=session.get('userlevel'))
 
 @app.route('/search', methods=['POST', 'GET'])
+@login_required
 def search():
     if 'comment' in request.form:
         userID = db.session.query(accounts.userID).filter_by(username=session.get('name')).first()

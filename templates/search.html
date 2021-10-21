@@ -18,20 +18,23 @@
         <div id="postlist" class="postlist">
         {% for post in posts %}
             {% if post.blocked=='false' %}
-                {% for user in everuser %}
-                    {% if userlevel=='A' %}
-                        <center><form id="blockpost" method="post" >
-                            <input type="hidden" id="postID" name="postID" value="{{ post.postID }}">
-                            <input type="hidden" id="block" name="block">
-                            <button type="submit">Block Post</button>
-                        </form></center>
-                    {% endif %}
+            <div id="currpost" class="currpost">
+                {% if userlevel=='admin' %}
+                    <center><form id="blockpost" method="post" >
+                        <input type="hidden" id="postID" name="postID" value="{{ post.postID }}">
+                        <input type="hidden" id="block" name="block">
+                        <button type="submit">Block Post</button>
+                    </form></center>
+                {% endif %}
+                {% for user in everyuser %}
                     {% if post.uID == user.userID %}
                         <center><h2><p style="color:black";>Posted by: {{user.username}}</p></h2></center>
                     {% endif %}
                 {% endfor %}
+                <div id="postcontent" class="postcontent">
                 <center><img src="{{ url_for('static', filename='upload/'+post.filename) }}" width="300" height="200"/></center>
                 <center><h6><p style="color:black";>{{post.description}}</p></h6></center>
+                </div><br>
 
                 <center><div id="commentlist"  class="commentlist">
                 {% for comment in comments %}
@@ -43,7 +46,7 @@
                         {% endfor %}
                     {% endif %}
                 {% endfor %}
-                </div>
+                </div><br>
                 </center>
 
                 <center><form id="sendcomment" method="post" >
@@ -55,6 +58,7 @@
                 </form>
                 </center>
                 <br>
+            </div>
              {% endif %}
         {% endfor %}
         </div>
