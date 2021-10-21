@@ -334,4 +334,4 @@ def handle_sendMessage_event(data):
 
 # we still need to do block post and create user accounts
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    app.run()
