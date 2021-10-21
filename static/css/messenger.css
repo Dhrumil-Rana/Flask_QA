@@ -1,16 +1,12 @@
 html{
     font-family: Georgia, serif;
-    background: black;
-    color: #ffffff;
+    background: gray;
+    color: #000000;
     text-align: center;
 }
 
 h1{
     text-align: center;
-}
-
-h2{
-    text-align: left;
 }
 
 .messagelist{
@@ -25,8 +21,10 @@ h2{
 .usermsg{
     background: gray;
     height: 30px;
+    text-align: right;
 }
 
 .friendmsg{
     background: gray;
+    text-align: left;
 }
