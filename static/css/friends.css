@@ -12,7 +12,7 @@ h1{
 .friendslist{
     margin: auto;
     width: 30%;
-    background: gray;
+    background: #cccccc;
     overflow: auto;
     border: 1px solid #f6ff00;
 }

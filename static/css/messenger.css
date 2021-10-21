@@ -14,17 +14,15 @@ h1{
     width: 75%;
     word-break: break-word;
     overflow: auto;
-    background: gray;
+    background: #cccccc;
     border: 1px solid #f6ff00;
 }
 
 .usermsg{
-    background: gray;
     height: 30px;
     text-align: right;
 }
 
 .friendmsg{
-    background: gray;
     text-align: left;
 }
