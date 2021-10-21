@@ -3,14 +3,13 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO, send, emit, ConnectionRefusedError, join_room
 from functools import wraps
 import pickle
-import eventlet
 import bcrypt
 import urllib.request
 from werkzeug.utils import secure_filename
 import os
 
 app = Flask(__name__)
-socketio = SocketIO(app, engineio_logger=True, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 ENV = 'prod'
 select_database = 'almin'
