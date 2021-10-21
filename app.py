@@ -1,15 +1,21 @@
-from flask import Flask,request,render_template,session,url_for, flash
+from flask import Flask,request,render_template,session,redirect,url_for,flash
 from flask_sqlalchemy import SQLAlchemy
+from flask_socketio import SocketIO, send, emit, ConnectionRefusedError, join_room
 import pickle
-import urllib.request
+import eventlet
 import bcrypt
+import urllib.request
 from werkzeug.utils import secure_filename
 import os
+import base64
+from base64 import b64encode
+
 
 app = Flask(__name__)
+socketio = SocketIO(app, engineio_logger=True, cors_allowed_origins="*")
 
 ENV = 'prod'
-select_database = 'dhrumil'
+select_database = 'almin'
 
 #this is for localhost
 if ENV == 'dev':
@@ -26,7 +32,6 @@ else:
     else:
         app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://onagbacopzfapd:985b15068892b63537c9a10a74d74d6579c45f677b4cba87594a09806e78e14d@ec2-52-23-87-65.compute-1.amazonaws.com:5432/d29sd9q7h5fs67'
 
-
 #this is general
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key='very secret key'
@@ -35,6 +40,7 @@ db = SQLAlchemy(app)
 #this is saving post detail
 UPLOAD_FOLDER = 'static/upload/'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 
 def allowed_file(filename):
@@ -57,19 +63,20 @@ class posts(db.Model):
     __tablename__ = 'posts'
     postID = db.Column(db.Integer, primary_key=True)
     uID = db.Column(db.Integer, db.ForeignKey('accounts.userID'), nullable=False)
-    image = db.Column(db.Text, nullable=True)
+    image = db.Column(db.LargeBinary, nullable=True)
     description = db.Column(db.VARCHAR, nullable=True)
     filename = db.Column(db.Text, nullable=True)
     mimetype = db.Column(db.Text, nullable=True)
     blocked = db.Column(db.Text, nullable=False)
 
-    def __init__(self,uID, image, description, filename, mimetype,blocked):
+    def __init__(self,uID, image, description, filename, mimetype, blocked):
         self.uID = uID
         self.image = image
         self.description = description
         self.filename = filename
         self.mimetype = mimetype
         self.blocked = blocked
+
 
 class comments(db.Model):
     __tablename__ = 'comments'
@@ -136,34 +143,70 @@ def login():
 
 @app.route('/home', methods=['POST', 'GET'])
 def home():
+    if request.method == 'GET':
         post = posts.query.all()
         comment = comments.query.all()
+
         return render_template('home.html',name=session.get('name'), userlevel=session.get('userlevel'), posts=post, comments=comment)
+# return a list of post and gian has to make a css file such that it will show in sequence
 
 
 @app.route('/Friends', methods=['POST', 'GET'])
 def friend():
-    return "This is the Friends page"
+    #getting userid then getting friends and filling friendlist
+    user= db.session.query(accounts.userID).filter_by(username=session.get('name')).first()
+    friendIDlist=db.session.query(friends.friendID).filter_by(userID=user)
+    friendlist = []
+    for friendID in friendIDlist:
+        f = db.session.query(accounts.username).filter_by(userID=friendID).first()
+        friendlist.append(f)
+    # getting userid then getting friends and filling friendlist
+    print(friendlist)
+    return render_template("friends.html",friends=friendlist, title="Friends", name=session.get('name'), userlevel=session.get('userlevel') )
+#return a list of all the friends
+
+
+@app.route('/messanger/<name>/<friendname>', methods=['GET'])
+def messanger(name, friendname):
+    msgToSend = ''
+    sender = session.get('name')
+    friendsID = db.session.query(accounts.userID).filter_by(username=friendname).first()  #receiver
+    usersID = db.session.query(accounts.userID).filter_by(username=session.get('name')).first() #sender or current user
+    sentmsgs = db.session.query(message.msgID,message.msg,message.senderID).filter_by(senderID=usersID,receiverID=friendsID).all() #msgs sent by the current user to friend
+    receivedmsgs = db.session.query(message.msgID,message.msg,message.senderID).filter_by(senderID=friendsID,receiverID=usersID).all() #msgs sent by friend to current user
+    allmsgs = sentmsgs + receivedmsgs
+    allmsgs.sort()
+    print(allmsgs)
+
+    if request.method == 'GET':
+        return render_template("messanger.html", title="Messanger", msgsALL=allmsgs, msgsSent=sentmsgs, msgsReceived=receivedmsgs, sendersID=usersID[0], friend=friendname, friendID=friendsID[0], name=session.get('name'), userlevel=session.get('userlevel'))
 
 
 
 @app.route('/CreatePost', methods=['POST', 'GET'])
 def Post():
+
+    def render_picture(data):
+        render_pic = base64.b64encode(data).decode('ascii')
+        return rende_pic
+    
     if request.method == 'POST':
         usertext = request.form['usertext']
         image = request.files['img']
         if allowed_file(image.filename):
             filename = secure_filename(image.filename)
-            image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            #image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            image = file.read()
+            rendered_data = render_picture(image)
             mimetype = image.mimetype
             blocked = "false"
         else:
-            flash('Allowed image types are - png, jpg, jpeg')
+            flash('Allowed image types are - png, jpg, jpeg, gif')
             return redirect(request.url)
 
         account = accounts.query.filter_by(username=session.get('name')).first()
         userid = account.userID
-        post = posts(uID=userid,image=image.read(), description=usertext, filename=filename, mimetype=mimetype, blocked=blocked)
+        post = posts(uID=userid,image=rendered_data, description=usertext, filename=filename, mimetype=mimetype, blocked=blocked)
         db.session.add(post)
         db.session.commit()
         return render_template("createpost.html", title="Home", name=session.get('name'), userlevel=session.get('userlevel'), filename=filename )
@@ -178,21 +221,37 @@ def addaccount():
         passIN = request.form['password']
         newrole = request.form['role']
         newpassword = bcrypt.hashpw(passIN.encode('utf-8'), bcrypt.gensalt())
-        user = accounts(username=newuserName, password=newpassword.decode('utf-8'), role=newrole)
+        user = accounts(username= newuserName, password=newpassword.decode('utf-8'), role=newrole)
         db.session.add(user)
         db.session.commit()
-        return newpassword
+        return render_template("addaccount.html", title="Add Account", name=session.get('name'),userlevel=session.get('userlevel'))
+
     if request.method == 'GET':
-        return render_template("addaccount.html", title="Create Post", name=session.get('name'),userlevel=session.get('userlevel'))
+        return render_template("addaccount.html", title="Add Account", name=session.get('name'),userlevel=session.get('userlevel'))
 
-@app.route('/search', methods=['POST', 'GET'])
-def search():
-    src = request.form['search']
-    resulted_post = posts.query.filter_by(description=src).all()
-    resulted_users = accounts.query.filter_by(username=src).all()
-    return render_template("search.html", posts=resulted_post, users=resulted_users, search_txt=src)
 
+@socketio.on("joined")
+def handle_event_joined(data):
+    #new room is a room which the user joins when they select a friend to receive messages from and send to
+    newRoom = data['userID'] +":" + data['friendID']  #the room is only for this user, not the friend
+    print(newRoom)
+    join_room(newRoom)
+    print(data)
+
+@socketio.on("sendMessage")
+def handle_sendMessage_event(data):
+
+    #adding message to the database
+    messageSEND = message(msg=data['message'], senderID=data['userID'], receiverID=data['friendID'])
+    db.session.add(messageSEND)
+    db.session.commit()
+
+    #sending message to the friends receiving room for our user
+    sendToRoom = data['friendID'] + ":" + data['userID']
+    socketio.emit('receiveMessage',data,room=sendToRoom)
+    print("sending to: "+sendToRoom)
+    print(data)
 
 # we still need to do block post and create user accounts
 if __name__ == '__main__':
-    app.run()
+    socketio.run(app, debug=True)
