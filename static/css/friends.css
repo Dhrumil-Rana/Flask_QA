@@ -1,0 +1,18 @@
+html{
+    font-family: Georgia, serif;
+    background: gray;
+    color: #000000;
+    text-align: center;
+}
+
+h1{
+    text-align: center;
+}
+
+.friendslist{
+    margin: auto;
+    width: 30%;
+    background: #cccccc;
+    overflow: auto;
+    border: 1px solid #f6ff00;
+}

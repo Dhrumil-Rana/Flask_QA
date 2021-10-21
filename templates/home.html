@@ -1,31 +1,33 @@
 {% extends 'layout.html' %}
 
 {% block css %}
-    <link rel="stylesheet" type = "text/css" href="{{ url_for ('static' , filename='css/login.css') }}">
+    <link rel="stylesheet" type = "text/css" href="{{ url_for ('static' , filename='css/home.css') }}">
 {% endblock %}
 
 {% block content %}
     <h1 class="result">
-            You are signed in as: {{name}}.<br><br>
-            Your access level is: {{userlevel}}
+            Welcome, {{name}}.<br><br>
     </h1>
     <div id="postlist" class="postlist">
     {% for post in posts %}
         {% if post.blocked=='false' %}
-            {% for user in users %}
-                {% if userlevel=='A' %}
+        <div id="currpost" class="currpost">
+            {% if userlevel=='admin' %}
                     <center><form id="blockpost" method="post" >
                         <input type="hidden" id="postID" name="postID" value="{{ post.postID }}">
                         <input type="hidden" id="block" name="block">
                         <button type="submit">Block Post</button>
                     </form></center>
-                {% endif %}
+            {% endif %}
+            {% for user in users %}
                 {% if post.uID == user.userID %}
-                    <center><h6><p style="color:white";>Posted by: {{user.username}}</p></h6></center>
+                    <center><h2><p style="color:black";>Posted by: {{user.username}}</p></h2></center>
                 {% endif %}
             {% endfor %}
+            <div id="postcontent" class="postcontent">
             <center><img src="{{ url_for('static', filename='upload/'+post.filename) }}" width="300" height="200"/></center>
-            <center><h6><p style="color:white";>{{post.description}}</p></h6></center>
+            <center><h6><p style="color:black";>{{post.description}}</p></h6></center>
+            </div><br>
 
             <center><div id="commentlist"  class="commentlist">
             {% for comment in comments %}
@@ -38,7 +40,7 @@
                 {% endif %}
             {% endfor %}
             </div>
-            </center>
+            </center><br>
 
             <center><form id="sendcomment" method="post" >
                 <input type="text" id="comment_input" name="comment_input" placeholder="Comment on post">
@@ -48,6 +50,7 @@
             </form>
             </center>
             <br>
+         </div>
          {% endif %}
     {% endfor %}
     </div>
