@@ -37,7 +37,7 @@
             }
         });
         socket.on('receiveMessage', function(data) {
-            var newMSG = '<div class="usermsg"><h2>'+data.user+' : ' + data.message + ' </h2></div>';
+            var newMSG = '<div class="friendmsg"><h2>'+data.user+' : ' + data.message + ' </h2></div>';
             document.getElementById('messagelist').insertAdjacentHTML('beforeend',newMSG);
         });
 
