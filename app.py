@@ -232,7 +232,6 @@ def friend():
 
 
 @app.route('/messanger/<name>/<friendname>', methods=['GET'])
-@login_required
 def messanger(name, friendname):
     msgToSend = ''
     sender = session.get('name')
