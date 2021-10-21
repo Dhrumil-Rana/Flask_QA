@@ -331,6 +331,7 @@ def handle_sendMessage_event(data):
     print("sending to: "+sendToRoom)
     print(data)
 
-# we still need to do block post and create user accounts
 if __name__ == '__main__':
-    app.run()
+    socketio.run(app)
+    # socketio.run(app) if local
+    #app.run() if going to deploy to heroku
