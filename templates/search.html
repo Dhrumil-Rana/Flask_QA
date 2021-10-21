@@ -19,7 +19,7 @@
         {% for post in posts %}
             {% if post.blocked=='false' %}
                 {% for user in everuser %}
-                    {% if user.role=='A' %}
+                    {% if userlevel=='A' %}
                         <center><form id="blockpost" method="post" >
                             <input type="hidden" id="postID" name="postID" value="{{ post.postID }}">
                             <input type="hidden" id="block" name="block">
