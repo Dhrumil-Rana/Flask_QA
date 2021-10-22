@@ -195,7 +195,7 @@ def Post():
         if allowed_file(image.filename):
             filename = secure_filename(image.filename)
             #image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            image = file.read()
+            image = image.read()
             rendered_data = render_picture(image)
             mimetype = image.mimetype
             blocked = "false"
@@ -247,6 +247,7 @@ def handle_sendMessage_event(data):
     socketio.emit('receiveMessage',data,room=sendToRoom)
     print("sending to: "+sendToRoom)
     print(data)
+
 
 # we still need to do block post and create user accounts
 if __name__ == '__main__':
