@@ -15,7 +15,7 @@ app = Flask(__name__)
 socketio = SocketIO(app, engineio_logger=True, cors_allowed_origins="*")
 
 ENV = 'prod'
-select_database = 'almin'
+select_database = 'dhrumil'
 
 #this is for localhost
 if ENV == 'dev':
@@ -63,7 +63,7 @@ class posts(db.Model):
     __tablename__ = 'posts'
     postID = db.Column(db.Integer, primary_key=True)
     uID = db.Column(db.Integer, db.ForeignKey('accounts.userID'), nullable=False)
-    image = db.Column(db.LargeBinary, nullable=True)
+    image = db.Column(db.Text, nullable=True)
     description = db.Column(db.VARCHAR, nullable=True)
     filename = db.Column(db.Text, nullable=True)
     mimetype = db.Column(db.Text, nullable=True)
@@ -201,9 +201,8 @@ def Post():
             mimetype = image.mimetype
             blocked = "false"
         else:
-            flash('Allowed image types are - png, jpg, jpeg, gif')
+            flash('Allowed image types are - png, jpg, jpeg')
             return redirect(request.url)
-
         account = accounts.query.filter_by(username=session.get('name')).first()
         userid = account.userID
         post = posts(uID=userid,image=rendered_data, description=usertext, filename=filename, mimetype=mimetype, blocked=blocked)
@@ -240,12 +239,10 @@ def handle_event_joined(data):
 
 @socketio.on("sendMessage")
 def handle_sendMessage_event(data):
-
     #adding message to the database
     messageSEND = message(msg=data['message'], senderID=data['userID'], receiverID=data['friendID'])
     db.session.add(messageSEND)
     db.session.commit()
-
     #sending message to the friends receiving room for our user
     sendToRoom = data['friendID'] + ":" + data['userID']
     socketio.emit('receiveMessage',data,room=sendToRoom)
