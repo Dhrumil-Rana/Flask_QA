@@ -207,7 +207,7 @@ def Post():
         post = posts(uID=userid,image=rendered_data, description=usertext, filename=filename, mimetype=mimetype, blocked=blocked)
         db.session.add(post)
         db.session.commit()
-        return render_template("createpost.html", title="Home", name=session.get('name'), userlevel=session.get('userlevel'), filename=filename )
+        return render_template("createpost.html", title="Home", name=session.get('name'), userlevel=session.get('userlevel'), filename=filename, image=rendered_data )
     if request.method == 'GET':
         return render_template("createpost.html", title="Create Post", name=session.get('name'), userlevel=session.get('userlevel'))
 
