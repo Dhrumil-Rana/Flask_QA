@@ -1,6 +1,6 @@
 from flask import Flask,request,render_template,session,redirect,url_for,flash
 from flask_sqlalchemy import SQLAlchemy
-from flask_socketio import SocketIO, send, emit, ConnectionRefusedError, join_room
+#from flask_socketio import SocketIO, send, emit, ConnectionRefusedError, join_room
 import pickle
 import bcrypt
 import urllib.request
@@ -11,7 +11,7 @@ from base64 import b64encode
 
 
 app = Flask(__name__)
-socketio = SocketIO(app, engineio_logger=True, cors_allowed_origins="*")
+#socketio = SocketIO(app, engineio_logger=True, cors_allowed_origins="*")
 
 ENV = 'prod'
 select_database = 'dhrumil'
@@ -207,7 +207,7 @@ def Post():
         post = posts(uID=userid,image=rendered_data, description=usertext, filename=filename, mimetype=mimetype, blocked=blocked)
         db.session.add(post)
         db.session.commit()
-        return render_template("createpost.html", title="Home", name=session.get('name'), userlevel=session.get('userlevel'), filename=filename, image=rendered_data )
+        return render_template("createpost.html", title="Home", name=session.get('name'), userlevel=session.get('userlevel'), filename=filename, image=rendered_data, mimetype=mimetype )
     if request.method == 'GET':
         return render_template("createpost.html", title="Create Post", name=session.get('name'), userlevel=session.get('userlevel'))
 
@@ -227,7 +227,7 @@ def addaccount():
     if request.method == 'GET':
         return render_template("addaccount.html", title="Add Account", name=session.get('name'),userlevel=session.get('userlevel'))
 
-
+'''
 @socketio.on("joined")
 def handle_event_joined(data):
     #new room is a room which the user joins when they select a friend to receive messages from and send to
@@ -247,7 +247,7 @@ def handle_sendMessage_event(data):
     socketio.emit('receiveMessage',data,room=sendToRoom)
     print("sending to: "+sendToRoom)
     print(data)
-
+'''
 
 # we still need to do block post and create user accounts
 if __name__ == '__main__':

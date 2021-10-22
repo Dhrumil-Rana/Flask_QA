@@ -17,9 +17,9 @@
             <textarea rows="4" cols="80" name="usertext" wrap="hard" placeholder="Enter your thoughts here." form="userpost"></textarea><br>
             <label for="img">Attach image:</label>
             <input type="file" id="img" name="img" accept=".png, .jpg, .jpeg"><br>
-            {% if filename %}
+            {% if image %}
             <div>
-            <img src="{{ url_for('static', filename='upload/'+filename) }}" width="193" height="130">
+            <img src="data:{{mimetype}};base64,{{image}}" alt ="don't have an image" width="193" height="130">
             </div>
             {% endif %}
             <input type="submit" value="Post" onclick = "alert('Thanks for Post {{name}}')">
