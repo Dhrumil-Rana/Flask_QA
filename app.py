@@ -194,10 +194,10 @@ def Post():
         image = request.files['img']
         if allowed_file(image.filename):
             filename = secure_filename(image.filename)
+            mimetype = image.mimetype
             #image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             image = image.read()
             rendered_data = render_picture(image)
-            mimetype = image.mimetype
             blocked = "false"
         else:
             flash('Allowed image types are - png, jpg, jpeg')
