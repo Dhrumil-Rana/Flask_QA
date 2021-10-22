@@ -2,7 +2,6 @@ from flask import Flask,request,render_template,session,redirect,url_for,flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO, send, emit, ConnectionRefusedError, join_room
 import pickle
-import eventlet
 import bcrypt
 import urllib.request
 from werkzeug.utils import secure_filename
