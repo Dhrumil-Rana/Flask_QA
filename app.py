@@ -3,7 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO, send, emit, ConnectionRefusedError, join_room
 import pickle
 import bcrypt
-import eventlet
 import urllib.request
 from werkzeug.utils import secure_filename
 import os
