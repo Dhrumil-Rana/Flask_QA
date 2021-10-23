@@ -1,8 +1,9 @@
 from flask import Flask,request,render_template,session,redirect,url_for,flash
 from flask_sqlalchemy import SQLAlchemy
-#from flask_socketio import SocketIO, send, emit, ConnectionRefusedError, join_room
+from flask_socketio import SocketIO, send, emit, ConnectionRefusedError, join_room
 import pickle
 import bcrypt
+import eventlet
 import urllib.request
 from werkzeug.utils import secure_filename
 import os
@@ -11,7 +12,7 @@ from base64 import b64encode
 
 
 app = Flask(__name__)
-#socketio = SocketIO(app, engineio_logger=True, cors_allowed_origins="*")
+socketio = SocketIO(app, engineio_logger=True, cors_allowed_origins="*")
 
 ENV = 'prod'
 select_database = 'dhrumil'
@@ -195,7 +196,6 @@ def Post():
         if allowed_file(image.filename):
             filename = secure_filename(image.filename)
             mimetype = image.mimetype
-            #image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             image = image.read()
             rendered_data = render_picture(image)
             blocked = "false"
@@ -227,7 +227,7 @@ def addaccount():
     if request.method == 'GET':
         return render_template("addaccount.html", title="Add Account", name=session.get('name'),userlevel=session.get('userlevel'))
 
-'''
+
 @socketio.on("joined")
 def handle_event_joined(data):
     #new room is a room which the user joins when they select a friend to receive messages from and send to
@@ -238,6 +238,7 @@ def handle_event_joined(data):
 
 @socketio.on("sendMessage")
 def handle_sendMessage_event(data):
+
     #adding message to the database
     messageSEND = message(msg=data['message'], senderID=data['userID'], receiverID=data['friendID'])
     db.session.add(messageSEND)
@@ -247,7 +248,7 @@ def handle_sendMessage_event(data):
     socketio.emit('receiveMessage',data,room=sendToRoom)
     print("sending to: "+sendToRoom)
     print(data)
-'''
+
 
 # we still need to do block post and create user accounts
 if __name__ == '__main__':
