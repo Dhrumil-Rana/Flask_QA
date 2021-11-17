@@ -1,0 +1,46 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+    <link rel="stylesheet" type = "text/css" href="{{ url_for ('static' , filename='css/search.css') }}">
+{% endblock %}
+
+{% block content %}
+    <h1>Any blocked posts will appear here.</h1>
+    <div id="postlist" class="postlist">
+    {% for post in posts %}
+        {% if post.blocked=='true' %}
+        <div id="currpost" class="currpost">
+            {% for user in users %}
+                {% if post.uID == user.userID %}
+                    <center><h6><p style="color:white";>Posted by: {{user.username}}</p></h6></center>
+                {% endif %}
+            {% endfor %}
+            <div id="postcontent" class="postcontent">
+            <center><img src="{{ url_for('static', filename='upload/'+post.filename) }}" width="300" height="200"/></center>
+            <center><h6><p style="color:white";>{{post.description}}</p></h6></center>
+            </div><br>
+
+            <center><div id="commentlist"  class="commentlist">
+            {% for comment in comments %}
+                {% if comment.postID == post.postID %}
+                    {% for user in users %}
+                        {% if comment.commenterID==user.userID %}
+                            <div class="comments"><h6><p>{{ user.username }} commented: {{ comment.textComment }}</p></h6></div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+            </div><br>
+            </center>
+            <center><form id="unblockpost" method="post" >
+                    <input type="hidden" id="postID" name="postID" value="{{ post.postID }}">
+                    <input type="hidden" id="unblock" name="unblock">
+                    <button type="submit">Unblock Post</button>
+            </form></center>
+            <br>
+        </div>
+         {% endif %}
+    {% endfor %}
+    </div>
+
+{% endblock %}

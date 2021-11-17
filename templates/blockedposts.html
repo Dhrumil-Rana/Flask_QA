@@ -16,7 +16,9 @@
                 {% endif %}
             {% endfor %}
             <div id="postcontent" class="postcontent">
-            <center><img src="{{ url_for('static', filename='upload/'+post.filename) }}" width="300" height="200"/></center>
+            {% if post.image != None %}
+	            <center><img src="data:{{post.mimetype}};base64,{{post.image}}" width="300"/></center>
+            {% endif %}
             <center><h3><p style="color:black";>{{post.description}}</p></h3></center>
             </div><br>
 
