@@ -21,7 +21,7 @@
             {% endif %}
             {% for user in users %}
                 {% if post.uID == user.userID %}
-                    <center><h2><a href="/profile/{{ name }}">{{ name }}</a></h2></center>
+                    <center><h2><a href="/profile/{{ user.username }}">{{ user.username }}</a></h2></center>
                 {% endif %}
             {% endfor %}
             <div id="postcontent" class="postcontent">
