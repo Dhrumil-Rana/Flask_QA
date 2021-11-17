@@ -7,19 +7,15 @@
 
 {% block content %}
     <h1 class="post">Create Post</h1>
-*Still need to implement rich text so the buttons actually work*<br>
 
     <form id="userpost" enctype="multipart/form-data" method="post" title="Post">
-            <input type = "checkbox" name = "bold" value = "B"> B
-            <input type = "checkbox" name = "italic" value = "I"> I
-            <input type = "checkbox" name = "underline" value = "U"> U
         <div class="postfield">
             <textarea rows="4" cols="80" name="usertext" wrap="hard" placeholder="Enter your thoughts here." form="userpost"></textarea><br>
             <label for="img">Attach image:</label>
-            <input type="file" id="img" name="img" accept=".png, .jpg, .jpeg"><br>
-            {% if image %}
+            <input type="file" id="img" name="img" accept=".png, .jpg, .jpeg .gif"><br>
+            {% if filename %}
             <div>
-            <img src="data:{{mimetype}};base64,{{image}}" alt ="don't have an image" width="193" height="130">
+            <center><img src="data:{{post.mimetype}};base64,{{post.image}}" width="300"/></center>
             </div>
             {% endif %}
             <input type="submit" value="Post" onclick = "alert('Thanks for Post {{name}}')">

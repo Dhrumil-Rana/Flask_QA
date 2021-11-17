@@ -7,7 +7,7 @@
     top: 0;
     left: 0;
     overflow: hidden;
-    background-color: #d8bd15;
+    background-image: linear-gradient(180deg, #f83cd7, #e868b3);
 }
 
 .bar ul li{
@@ -20,13 +20,26 @@
     text-align: center;
     padding: 14px 16px;
     text-decoration: none;
+    border-left: 1px solid #000000;
 }
 
 .bar ul li a:hover{
-    background-color: #7a690e;
+    background-image: linear-gradient(180deg, #c209a4, #c209a4);
 }
 
-.bar{
+#searchBtn{
     display: inline-block;
+    border: 1px solid rebeccapurple;
+    border-radius: 20px;
+    color: #ffffff;
+    background-image: linear-gradient(45deg, rebeccapurple, mediumpurple);
+    padding: 10px 10px;
 }
 
+#searchBtn:hover{
+    background-image: linear-gradient(45deg, #4f2678, #6e53a6);
+}
+
+body{
+    padding-top: 50px;
+}

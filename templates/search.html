@@ -6,31 +6,64 @@
 
 {% block content %}
     {% if users %}
-        <h3>Users Found:</h3>
+        <h2>Users Found:</h2>
         {% for user in users %}
-            <h6>{{user.username}}</h6>
+            <h2>{{user.username}}</h2>
         {% endfor %}
     {%  else %}
         <h2>No users found by the name: {{search_txt}}</h2>
     {% endif %}
     {% if posts %}
         <h2>Posts found:</h2>
+        <div id="postlist" class="postlist">
         {% for post in posts %}
-            <center><img src="{{ url_for('static', filename='upload/'+post.filename) }}" width="600" /></center>
-                   <center><h6><p style="color:white";>{{post.description}}</p></h6></center>
-            <br>
-            <div class="addcomment">
-                <center>
-                <input type="comment" placeholder="Add a comment...">
-                <button type="submit">Add comment</button>
-                </center>
-            </div>
-            {% for comment in comments %}}
-                {% if comment.id == post.id %}
-                    <p>comment.textComment</p>
+            {% if post.blocked=='false' %}
+            <div id="currpost" class="currpost">
+                {% if userlevel=='admin' %}
+                    <center><br><form id="blockpost" method="post" >
+                        <input type="hidden" id="postID" name="postID" value="{{ post.postID }}">
+                        <input type="hidden" id="block" name="block">
+                        <button type="submit">Block Post</button>
+                    </form></center>
                 {% endif %}
-            {% endfor %}
+                {% for user in everyuser %}
+                    {% if post.uID == user.userID %}
+                        <center><h2><p style="color:black";>{{user.username}}'s post</p></h2></center>
+                    {% endif %}
+                {% endfor %}
+                <div id="postcontent" class="postcontent">
+                {% if post.image != None %}
+	                <center><img src="data:{{post.mimetype}};base64,{{post.image}}" width="300"/></center>
+                {% endif %}
+                <center><h3><p style="color:black";>{{post.description}}</p></h3></center>
+                </div><br>
+
+                <center><div id="commentlist"  class="commentlist">
+                {% for comment in comments %}
+                    {% if comment.postID == post.postID %}
+                        {% for user in everyuser %}
+                            {% if comment.commenterID==user.userID %}
+                                <div class="comments"><h4><p>{{ user.username }} commented: {{ comment.textComment }}</p></h4></div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
+                </div><br>
+                </center>
+
+                <center><form id="sendcomment" method="post" >
+                    <input type="text" id="comment_input" name="comment_input" placeholder="Comment on post">
+                    <input type="hidden" id="comment" name="comment">
+                    <input type="hidden" id="searchtxt" name="searchtxt" value="{{ search_txt }}">
+                    <input type="hidden" id="postID" name="postID" value="{{ post.postID }}">
+                    <button type="submit" id="commentSend">Send</button>
+                </form>
+                </center>
+                <br>
+            </div>
+             {% endif %}
         {% endfor %}
+        </div>
     {% else %}
         <h2>No posts found by the description: {{search_txt}}</h2>
     {% endif %}

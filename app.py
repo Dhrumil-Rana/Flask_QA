@@ -1,20 +1,19 @@
 from flask import Flask,request,render_template,session,redirect,url_for,flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO, send, emit, ConnectionRefusedError, join_room
+from functools import wraps
 import pickle
 import bcrypt
 import urllib.request
+import base64
 from werkzeug.utils import secure_filename
 import os
-import base64
-from base64 import b64encode
-
 
 app = Flask(__name__)
-socketio = SocketIO(app, engineio_logger=True, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 ENV = 'prod'
-select_database = 'dhrumil'
+select_database = 'almin'
 
 #this is for localhost
 if ENV == 'dev':
@@ -111,46 +110,113 @@ class message(db.Model):
         self.receiverID = receiverID
         self.msg = msg
 
+def login_required(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'logged_in' in session:
+            return f(*args, **kwargs)
+        else:
+            flash('You need to login first')
+            return redirect(url_for('login'))
+    return wrap
+
 @app.route('/')
 def entry():
     return render_template("login.html")
 
+@app.route('/logout')
+@login_required
+def logout():
+    session.pop('logged_in', None)
+    session.pop('name', None)
+    session.pop('userlevel', None)
+    return redirect(url_for('login'))
+
 
 @app.route('/login',methods=['POST', 'GET'])
 def login():
-    nameIN = request.form['username']
-    passwordIN = request.form['password'].encode('utf-8')
+    if request.method=='POST':
+        nameIN = request.form['username']
+        passwordIN = request.form['password'].encode('utf-8')
 
-    # check if username is in the accounts database
-    user = accounts.query.filter_by(username=nameIN).first()
-    if user:
-        # compare password given to database hash
-        if bcrypt.checkpw(passwordIN, user.password.encode('utf-8')):
-            if user.role == 'U':
-                session['name']=request.form['username']
-                session['userlevel']="user"
-                return render_template('home.html', name=nameIN, userlevel='user')
+        # check if username is in the accounts database
+        user = accounts.query.filter_by(username=nameIN).first()
+        if user:
+            # compare password given to database hash
+            if bcrypt.checkpw(passwordIN, user.password.encode('utf-8')):
+                if user.role == 'U':
+                    session['logged_in']=True
+                    session['name']=request.form['username']
+                    session['userlevel']="user"
+                    return redirect(url_for('home'))
+                else:
+                    session['logged_in'] = True
+                    session['name']=request.form['username']
+                    session['userlevel'] = 'admin'
+                    return redirect(url_for('home'))
             else:
-                session['name']=request.form['username']
-                session['userlevel'] = 'admin'
-                return render_template('home.html', name=nameIN, userlevel='admin')
+                return render_template('login.html', info='Password incorrect.')
         else:
-            return render_template('login.html', info='Password incorrect.')
-    else:
-        return render_template('login.html', info='Account with that username does not exist.')
+            return render_template('login.html', info='Account with that username does not exist.')
+    if request.method=='GET':
+        return render_template('login.html')
 
+@app.route('/blockedPosts', methods=['POST', 'GET'])
+@login_required
+def blockedPosts():
+    if request.method=='GET':
+        post = posts.query.all()
+        commentlist = comments.query.all()
+        user = accounts.query.all()
+        return render_template('blockedposts.html', name=session.get('name'), userlevel=session.get('userlevel'), posts=post,
+                               comments=commentlist, users=user)
+    if request.method =='POST':
+        if 'unblock' in request.form:
+            blockpostID=request.form['postID']
+            #print("unblocking post"+ blockpostID)
+            blockpost = posts.query.filter_by(postID=blockpostID).first()
+            blockpost.blocked = 'false'
+            db.session.commit()
+
+        post = posts.query.all()
+        commentlist = comments.query.all()
+        user = accounts.query.all()
+        return (redirect('blockedPosts'))
 
 @app.route('/home', methods=['POST', 'GET'])
+@login_required
 def home():
     if request.method == 'GET':
         post = posts.query.all()
-        comment = comments.query.all()
+        commentlist = comments.query.all()
+        user = accounts.query.all()
 
-        return render_template('home.html',name=session.get('name'), userlevel=session.get('userlevel'), posts=post, comments=comment)
+        return render_template('home.html',name=session.get('name'), userlevel=session.get('userlevel'), posts=post, comments=commentlist,users=user)
+    if request.method =='POST':
+        if 'block' in request.form:
+            blockpostID=request.form['postID']
+            #print("blocking post"+ blockpostID)
+            blockpost = posts.query.filter_by(postID=blockpostID).first()
+            blockpost.blocked = 'true'
+            db.session.commit()
+
+        post = posts.query.all()
+        commentlist = comments.query.all()
+        user = accounts.query.all()
+
+        if 'comment' in request.form:
+            userID = db.session.query(accounts.userID).filter_by(username=session.get('name')).first()
+            commenttext=request.form['comment_input']
+            postID=request.form['postID']
+            commentSEND = comments(textComment=commenttext, commenterID=userID, postID=postID)
+            db.session.add(commentSEND)
+            db.session.commit()
+        return redirect('home')
 # return a list of post and gian has to make a css file such that it will show in sequence
 
 
 @app.route('/Friends', methods=['POST', 'GET'])
+@login_required
 def friend():
     #getting userid then getting friends and filling friendlist
     user= db.session.query(accounts.userID).filter_by(username=session.get('name')).first()
@@ -160,7 +226,7 @@ def friend():
         f = db.session.query(accounts.username).filter_by(userID=friendID).first()
         friendlist.append(f)
     # getting userid then getting friends and filling friendlist
-    print(friendlist)
+    #print(friendlist)
     return render_template("friends.html",friends=friendlist, title="Friends", name=session.get('name'), userlevel=session.get('userlevel') )
 #return a list of all the friends
 
@@ -175,7 +241,7 @@ def messanger(name, friendname):
     receivedmsgs = db.session.query(message.msgID,message.msg,message.senderID).filter_by(senderID=friendsID,receiverID=usersID).all() #msgs sent by friend to current user
     allmsgs = sentmsgs + receivedmsgs
     allmsgs.sort()
-    print(allmsgs)
+    #print(allmsgs)
 
     if request.method == 'GET':
         return render_template("messanger.html", title="Messanger", msgsALL=allmsgs, msgsSent=sentmsgs, msgsReceived=receivedmsgs, sendersID=usersID[0], friend=friendname, friendID=friendsID[0], name=session.get('name'), userlevel=session.get('userlevel'))
@@ -183,35 +249,46 @@ def messanger(name, friendname):
 
 
 @app.route('/CreatePost', methods=['POST', 'GET'])
+@login_required
 def Post():
-
     def render_picture(data):
         render_pic = base64.b64encode(data).decode('ascii')
         return render_pic
-    
+
     if request.method == 'POST':
-        usertext = request.form['usertext']
-        image = request.files['img']
-        if allowed_file(image.filename):
-            filename = secure_filename(image.filename)
-            mimetype = image.mimetype
-            image = image.read()
-            rendered_data = render_picture(image)
-            blocked = "false"
-        else:
-            flash('Allowed image types are - png, jpg, jpeg')
-            return redirect(request.url)
         account = accounts.query.filter_by(username=session.get('name')).first()
         userid = account.userID
-        post = posts(uID=userid,image=rendered_data, description=usertext, filename=filename, mimetype=mimetype, blocked=blocked)
+        blocked = "false"
+        if 'usertext' not in request.form:
+            flash('Post requires text')
+            return redirect(request.url)
+        usertext = request.form['usertext']
+        if 'img' in request.form:
+            image = request.files['img']
+            if allowed_file(image.filename):
+                filename = secure_filename(image.filename)
+                mimetype = image.mimetype
+                image = image.read()
+                rendered_data = render_picture(image)
+                post = posts(uID=userid, image=rendered_data, description=usertext, filename=filename,
+                             mimetype=mimetype,
+                             blocked=blocked)
+            else:
+                flash('Allowed image types are - png, jpg, jpeg')
+                return redirect(request.url)
+        else:
+            post = posts(uID=userid,image=None, filename=None,mimetype=None, description=usertext, blocked=blocked)
         db.session.add(post)
         db.session.commit()
-        return render_template("createpost.html", title="Home", name=session.get('name'), userlevel=session.get('userlevel'), filename=filename, image=rendered_data, mimetype=mimetype )
+        return redirect(url_for('home'))
     if request.method == 'GET':
-        return render_template("createpost.html", title="Create Post", name=session.get('name'), userlevel=session.get('userlevel'))
+        return render_template("createpost.html", title="Create Post", name=session.get('name'),
+                               userlevel=session.get('userlevel'))
+
 
 # gian will add the post through a form post and we will take it and add it to our database
 @app.route('/AddAccount', methods=['POST', 'GET'])
+@login_required
 def addaccount():
     if request.method == 'POST':
         newuserName = request.form['username']
@@ -226,14 +303,34 @@ def addaccount():
     if request.method == 'GET':
         return render_template("addaccount.html", title="Add Account", name=session.get('name'),userlevel=session.get('userlevel'))
 
+@app.route('/search', methods=['POST', 'GET'])
+@login_required
+def search():
+    if 'comment' in request.form:
+        userID = db.session.query(accounts.userID).filter_by(username=session.get('name')).first()
+        commenttext = request.form['comment_input']
+        postID = request.form['postID']
+        commentSEND = comments(textComment=commenttext, commenterID=userID, postID=postID)
+        db.session.add(commentSEND)
+        db.session.commit()
+        return redirect("home")
+    if 'search' in request.form:
+        src = request.form['search']
+        resulted_post = posts.query.filter_by(description=src).all()
+        resulted_users = accounts.query.filter_by(username=src).all()
+        resulted_comments = comments.query.all()
+        allusers = accounts.query.all()
+        #print(resulted_comments)
+    return render_template("search.html", posts=resulted_post, users=resulted_users, everyuser=allusers, search_txt=src, comments=resulted_comments,name=session.get('name'), userlevel=session.get('userlevel'))
 
+#socketio events
 @socketio.on("joined")
 def handle_event_joined(data):
     #new room is a room which the user joins when they select a friend to receive messages from and send to
     newRoom = data['userID'] +":" + data['friendID']  #the room is only for this user, not the friend
-    print(newRoom)
+    #print(newRoom)
     join_room(newRoom)
-    print(data)
+    #print(data)
 
 @socketio.on("sendMessage")
 def handle_sendMessage_event(data):
@@ -242,13 +339,14 @@ def handle_sendMessage_event(data):
     messageSEND = message(msg=data['message'], senderID=data['userID'], receiverID=data['friendID'])
     db.session.add(messageSEND)
     db.session.commit()
+
     #sending message to the friends receiving room for our user
     sendToRoom = data['friendID'] + ":" + data['userID']
     socketio.emit('receiveMessage',data,room=sendToRoom)
-    print("sending to: "+sendToRoom)
-    print(data)
+    #print("sending to: "+sendToRoom)
+    #print(data)
 
-
-# we still need to do block post and create user accounts
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    socketio.run(app)
+    # socketio.run(app) if local
+    #app.run() if going to deploy to heroku

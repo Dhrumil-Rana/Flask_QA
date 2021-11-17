@@ -1,24 +1,15 @@
 {% extends 'layout.html' %}
 
 {% block css %}
-    <link rel="stylesheet" type = "text/css" href="{{ url_for ('static' , filename='css/home.css') }}">
+    <link rel="stylesheet" type = "text/css" href="{{ url_for ('static' , filename='css/blocked.css') }}">
 {% endblock %}
 
 {% block content %}
-    <h1 class="result">
-            Welcome, {{name}}.<br><br>
-    </h1>
+    <h1>Any blocked posts will appear here.</h1>
     <div id="postlist" class="postlist">
     {% for post in posts %}
-        {% if post.blocked=='false' %}
+        {% if post.blocked=='true' %}
         <div id="currpost" class="currpost">
-            {% if userlevel=='admin' %}
-                    <center><br><form id="blockpost" method="post" >
-                        <input type="hidden" id="postID" name="postID" value="{{ post.postID }}">
-                        <input type="hidden" id="block" name="block">
-                        <button type="submit">Block Post</button>
-                    </form></center>
-            {% endif %}
             {% for user in users %}
                 {% if post.uID == user.userID %}
                     <center><h2><p style="color:black";>{{user.username}}'s post</p></h2></center>
@@ -41,18 +32,15 @@
                     {% endfor %}
                 {% endif %}
             {% endfor %}
-            </div>
-            </center><br>
-
-            <center><form id="sendcomment" method="post">
-                <input type="text" id="comment_input" name="comment_input" placeholder="Comment on post">
-                <input type="hidden" id="comment" name="comment">
-                <input type="hidden" id="postID" name="postID" value="{{ post.postID }}">
-                <button type="submit" id="commentSend">Send</button>
-            </form>
+            </div><br>
             </center>
+            <center><form id="unblockpost" method="post" >
+                    <input type="hidden" id="postID" name="postID" value="{{ post.postID }}">
+                    <input type="hidden" id="unblock" name="unblock">
+                    <button type="submit" id="unblockBtn">Unblock Post</button>
+            </form></center>
             <br>
-         </div>
+        </div>
          {% endif %}
     {% endfor %}
     </div>
