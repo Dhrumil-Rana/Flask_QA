@@ -6,9 +6,9 @@
 
 {% block content %}
     {% if users %}
-        <h3>Users Found:</h3>
+        <h2>Users Found:</h2>
         {% for user in users %}
-            <h6>{{user.username}}</h6>
+            <h2>{{user.username}}</h2>
         {% endfor %}
     {%  else %}
         <h2>No users found by the name: {{search_txt}}</h2>
@@ -20,7 +20,7 @@
             {% if post.blocked=='false' %}
             <div id="currpost" class="currpost">
                 {% if userlevel=='admin' %}
-                    <center><form id="blockpost" method="post" >
+                    <center><br><form id="blockpost" method="post" >
                         <input type="hidden" id="postID" name="postID" value="{{ post.postID }}">
                         <input type="hidden" id="block" name="block">
                         <button type="submit">Block Post</button>
@@ -28,12 +28,14 @@
                 {% endif %}
                 {% for user in everyuser %}
                     {% if post.uID == user.userID %}
-                        <center><h2><p style="color:black";>Posted by: {{user.username}}</p></h2></center>
+                        <center><h2><p style="color:black";>{{user.username}}'s post</p></h2></center>
                     {% endif %}
                 {% endfor %}
                 <div id="postcontent" class="postcontent">
-                <center><img src="{{ url_for('static', filename='upload/'+post.filename) }}" width="300" height="200"/></center>
-                <center><h6><p style="color:black";>{{post.description}}</p></h6></center>
+                {% if post.image != None %}
+	                <center><img src="data:{{post.mimetype}};base64,{{post.image}}" width="300"/></center>
+                {% endif %}
+                <center><h3><p style="color:black";>{{post.description}}</p></h3></center>
                 </div><br>
 
                 <center><div id="commentlist"  class="commentlist">
@@ -41,7 +43,7 @@
                     {% if comment.postID == post.postID %}
                         {% for user in everyuser %}
                             {% if comment.commenterID==user.userID %}
-                                <div class="comments"><h6><p>{{ user.username }} commented: {{ comment.textComment }}</p></h6></div>
+                                <div class="comments"><h4><p>{{ user.username }} commented: {{ comment.textComment }}</p></h4></div>
                             {% endif %}
                         {% endfor %}
                     {% endif %}
@@ -54,7 +56,7 @@
                     <input type="hidden" id="comment" name="comment">
                     <input type="hidden" id="searchtxt" name="searchtxt" value="{{ search_txt }}">
                     <input type="hidden" id="postID" name="postID" value="{{ post.postID }}">
-                    <button type="submit">Send</button>
+                    <button type="submit" id="commentSend">Send</button>
                 </form>
                 </center>
                 <br>

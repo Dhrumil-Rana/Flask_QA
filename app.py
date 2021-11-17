@@ -5,6 +5,7 @@ from functools import wraps
 import pickle
 import bcrypt
 import urllib.request
+import base64
 from werkzeug.utils import secure_filename
 import os
 
@@ -172,7 +173,7 @@ def blockedPosts():
     if request.method =='POST':
         if 'unblock' in request.form:
             blockpostID=request.form['postID']
-            print("unblocking post"+ blockpostID)
+            #print("unblocking post"+ blockpostID)
             blockpost = posts.query.filter_by(postID=blockpostID).first()
             blockpost.blocked = 'false'
             db.session.commit()
@@ -194,7 +195,7 @@ def home():
     if request.method =='POST':
         if 'block' in request.form:
             blockpostID=request.form['postID']
-            print("blocking post"+ blockpostID)
+            #print("blocking post"+ blockpostID)
             blockpost = posts.query.filter_by(postID=blockpostID).first()
             blockpost.blocked = 'true'
             db.session.commit()
@@ -225,7 +226,7 @@ def friend():
         f = db.session.query(accounts.username).filter_by(userID=friendID).first()
         friendlist.append(f)
     # getting userid then getting friends and filling friendlist
-    print(friendlist)
+    #print(friendlist)
     return render_template("friends.html",friends=friendlist, title="Friends", name=session.get('name'), userlevel=session.get('userlevel') )
 #return a list of all the friends
 
@@ -240,7 +241,7 @@ def messanger(name, friendname):
     receivedmsgs = db.session.query(message.msgID,message.msg,message.senderID).filter_by(senderID=friendsID,receiverID=usersID).all() #msgs sent by friend to current user
     allmsgs = sentmsgs + receivedmsgs
     allmsgs.sort()
-    print(allmsgs)
+    #print(allmsgs)
 
     if request.method == 'GET':
         return render_template("messanger.html", title="Messanger", msgsALL=allmsgs, msgsSent=sentmsgs, msgsReceived=receivedmsgs, sendersID=usersID[0], friend=friendname, friendID=friendsID[0], name=session.get('name'), userlevel=session.get('userlevel'))
@@ -250,26 +251,40 @@ def messanger(name, friendname):
 @app.route('/CreatePost', methods=['POST', 'GET'])
 @login_required
 def Post():
-    if request.method == 'POST':
-        usertext = request.form['usertext']
-        image = request.files['img']
-        if allowed_file(image.filename):
-            filename = secure_filename(image.filename)
-            image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            mimetype = image.mimetype
-            blocked = "false"
-        else:
-            flash('Allowed image types are - png, jpg, jpeg, gif')
-            return redirect(request.url)
+    def render_picture(data):
+        render_pic = base64.b64encode(data).decode('ascii')
+        return render_pic
 
+    if request.method == 'POST':
         account = accounts.query.filter_by(username=session.get('name')).first()
         userid = account.userID
-        post = posts(uID=userid,image=image.read(), description=usertext, filename=filename, mimetype=mimetype, blocked=blocked)
+        blocked = "false"
+        if 'usertext' not in request.form:
+            flash('Post requires text')
+            return redirect(request.url)
+        usertext = request.form['usertext']
+        if 'img' in request.form:
+            image = request.files['img']
+            if allowed_file(image.filename):
+                filename = secure_filename(image.filename)
+                mimetype = image.mimetype
+                image = image.read()
+                rendered_data = render_picture(image)
+                post = posts(uID=userid, image=rendered_data, description=usertext, filename=filename,
+                             mimetype=mimetype,
+                             blocked=blocked)
+            else:
+                flash('Allowed image types are - png, jpg, jpeg')
+                return redirect(request.url)
+        else:
+            post = posts(uID=userid,image=None, filename=None,mimetype=None, description=usertext, blocked=blocked)
         db.session.add(post)
         db.session.commit()
-        return render_template("createpost.html", title="Home", name=session.get('name'), userlevel=session.get('userlevel'), filename=filename )
+        return redirect(url_for('home'))
     if request.method == 'GET':
-        return render_template("createpost.html", title="Create Post", name=session.get('name'), userlevel=session.get('userlevel'))
+        return render_template("createpost.html", title="Create Post", name=session.get('name'),
+                               userlevel=session.get('userlevel'))
+
 
 # gian will add the post through a form post and we will take it and add it to our database
 @app.route('/AddAccount', methods=['POST', 'GET'])
@@ -305,7 +320,7 @@ def search():
         resulted_users = accounts.query.filter_by(username=src).all()
         resulted_comments = comments.query.all()
         allusers = accounts.query.all()
-        print(resulted_comments)
+        #print(resulted_comments)
     return render_template("search.html", posts=resulted_post, users=resulted_users, everyuser=allusers, search_txt=src, comments=resulted_comments,name=session.get('name'), userlevel=session.get('userlevel'))
 
 #socketio events
@@ -313,9 +328,9 @@ def search():
 def handle_event_joined(data):
     #new room is a room which the user joins when they select a friend to receive messages from and send to
     newRoom = data['userID'] +":" + data['friendID']  #the room is only for this user, not the friend
-    print(newRoom)
+    #print(newRoom)
     join_room(newRoom)
-    print(data)
+    #print(data)
 
 @socketio.on("sendMessage")
 def handle_sendMessage_event(data):
@@ -328,8 +343,8 @@ def handle_sendMessage_event(data):
     #sending message to the friends receiving room for our user
     sendToRoom = data['friendID'] + ":" + data['userID']
     socketio.emit('receiveMessage',data,room=sendToRoom)
-    print("sending to: "+sendToRoom)
-    print(data)
+    #print("sending to: "+sendToRoom)
+    #print(data)
 
 if __name__ == '__main__':
     socketio.run(app)
