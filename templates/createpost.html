@@ -15,7 +15,7 @@
             <input type="file" id="img" name="img" accept=".png, .jpg, .jpeg .gif"><br>
             {% if filename %}
             <div>
-            <img src="{{ url_for('static', filename='upload/'+filename) }}" width="193" height="130">
+            <center><img src="data:{{post.mimetype}};base64,{{post.image}}" width="300"/></center>
             </div>
             {% endif %}
             <input type="submit" value="Post" onclick = "alert('Thanks for Post {{name}}')">

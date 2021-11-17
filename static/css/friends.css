@@ -1,6 +1,6 @@
 html{
     font-family: Georgia, serif;
-    background: gray;
+    background-image: linear-gradient(45deg, #a84fff, #9c30ff);
     color: #000000;
     text-align: center;
 }
@@ -11,8 +11,9 @@ h1{
 
 .friendslist{
     margin: auto;
+    height: 500px;
     width: 30%;
     background: #cccccc;
     overflow: auto;
-    border: 1px solid #f6ff00;
+    border: 1px solid #760e7a;
 }
