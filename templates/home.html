@@ -5,33 +5,34 @@
 {% endblock %}
 
 {% block content %}
-    <h1 class="result">
+    <div class="result">
             Welcome, {{name}}.<br><br>
-    </h1>
+    </div>
     <div id="postlist" class="postlist">
     {% for post in posts %}
         {% if post.blocked=='false' %}
         <div id="currpost" class="currpost">
             {% if userlevel=='admin' %}
-                    <center><br><form id="blockpost" method="post" >
+                    <br><form id="blockpost" method="post" >
                         <input type="hidden" id="postID" name="postID" value="{{ post.postID }}">
                         <input type="hidden" id="block" name="block">
                         <button type="submit">Block Post</button>
-                    </form></center>
+                    </form>
+
             {% endif %}
             {% for user in users %}
                 {% if post.uID == user.userID %}
-                    <center><h2><p style="color:black";>{{user.username}}'s post</p></h2></center>
+                    <h2><p>{{user.username}}'s post</p></h2>
                 {% endif %}
             {% endfor %}
             <div id="postcontent" class="postcontent">
             {% if post.image != None %}
-	            <center><img src="data:{{post.mimetype}};base64,{{post.image}}" width="300"/></center>
+	            <img src="data:{{post.mimetype}};base64,{{post.image}}" width="300"/>
             {% endif %}
-            <center><h3><p style="color:black";>{{post.description}}</p></h3></center>
+                <h3><p>{{post.description}}</p></h3>
             </div><br>
 
-            <center><div id="commentlist"  class="commentlist">
+                <div id="commentlist"  class="commentlist">
             {% for comment in comments %}
                 {% if comment.postID == post.postID %}
                     {% for user in users %}
@@ -42,15 +43,14 @@
                 {% endif %}
             {% endfor %}
             </div>
-            </center><br>
+            <br>
 
-            <center><form id="sendcomment" method="post">
+            <form id="sendcomment" method="post">
                 <input type="text" id="comment_input" name="comment_input" placeholder="Comment on post">
                 <input type="hidden" id="comment" name="comment">
                 <input type="hidden" id="postID" name="postID" value="{{ post.postID }}">
                 <button type="submit" id="commentSend">Send</button>
             </form>
-            </center>
             <br>
          </div>
          {% endif %}

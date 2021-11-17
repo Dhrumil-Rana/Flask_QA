@@ -18,17 +18,20 @@ html{
 
 h1{
     text-align: center;
-    color: #000000;
+    color: #66c0f4;
 }
 
 h2{
     text-align: center;
-    color: #000000;
+    color: #66c0f4;
+}
+
+p{
+    color: #5c9fef;
 }
 
 
   .postlist{
-  display: flex;
   cursor: pointer;
   height: 100vh;
   max-width: 1300px;
@@ -83,16 +86,19 @@ h2{
 }
 
 .comments{
-    border: 1px solid #000000;
     width: 99%;
     margin: auto;
     overflow: auto;
-    background: #c958e7;
+    padding-right: 14%;
+    color: #66c0f4;
 }
 
 .sendcomment{
+    border: 1px solid rebeccapurple;
+    border-radius: 20px;
     margin: auto;
     text-align: center;
+
 }
 
 #commentSend{
@@ -105,4 +111,16 @@ h2{
 
 #commentSend:hover{
     background-image: linear-gradient(45deg, #4f2678, #6e53a6);
+}
+
+#comment_input{
+    border: 1px solid rebeccapurple;
+    border-radius: 20px;
+    margin: auto;
+    text-align: center;   
+}
+
+input[type="text"]
+{
+    font-size:30px;
 }

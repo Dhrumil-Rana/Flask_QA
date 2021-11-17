@@ -7,7 +7,7 @@
     top: 0;
     left: 0;
     overflow: hidden;
-    background-image: linear-gradient(180deg, #f83cd7, #e868b3);
+    background-image: linear-gradient(180deg, #c7d5e0, #c7d5e0);
 }
 
 .bar ul li{
@@ -24,7 +24,15 @@
 }
 
 .bar ul li a:hover{
-    background-image: linear-gradient(180deg, #c209a4, #c209a4);
+    background-image: linear-gradient(180deg, #2a475e, #2a475e);
+}
+
+#search{
+    border: 1px solid rebeccapurple;
+    border-radius: 20px;
+    margin: auto;
+    text-align: center;
+
 }
 
 #searchBtn{
@@ -32,14 +40,19 @@
     border: 1px solid rebeccapurple;
     border-radius: 20px;
     color: #ffffff;
-    background-image: linear-gradient(45deg, rebeccapurple, mediumpurple);
+    background-image: linear-gradient(45deg, #090b0c, #07090a);
     padding: 10px 10px;
 }
 
 #searchBtn:hover{
-    background-image: linear-gradient(45deg, #4f2678, #6e53a6);
+    background-image: linear-gradient(45deg, #0b0d0f, #0b0d0f);
 }
 
 body{
     padding-top: 50px;
+}
+
+input[type="text"]
+{
+    font-size:20px;
 }
