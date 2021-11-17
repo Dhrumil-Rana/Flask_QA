@@ -5,30 +5,60 @@ html{
 
 h1{
     text-align: center;
-    color: white;
+    color: #000000;
 }
 
 h2{
     text-align: center;
-    color: white;
+    color: #000000;
 }
 
-a:link {
-  color: #66c0f4;
+.accordion > input[name="collapse"] {
+    display:none;
 }
 
-a:visited {
-  color: #66c0f4;
+.accordion .content {
+  background: linear-gradient(to bottom, #171a21, #1b2838) fixed;
+  overflow: hidden;
+  max-height: 0;
+  transition: 0.5s;
+  box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.3);
+}
+.accordion label {
+  color: #fff;
+  cursor: pointer;
+  font-weight: normal;
+  background: linear-gradient(#2a475e, #1b2838);
+
 }
 
-a:hover {
-  text-decoration: underline;
+.accordion label:hover,
+.accordion label:focus {
+  background: #252525;
 }
 
-a:active {
-  text-decoration: underline;
+.accordion .handle label:before {
+  font-family: FontAwesome;
+  content: "\f107";
+  display: inline-block;
+  margin-right: 10px;
+  font-size: 1em;
+  line-height: 1.556em;
+  vertical-align: middle;
+  transition: 0.4s;
+
 }
 
+.accordion > input[name="collapse"]:checked ~ .handle label:before {
+    transform: rotate(180deg);
+    transform-origin: center;
+    transition: 0.4s;
+}
+.accordion > input[name="collapse"]:checked ~ .content {
+    max-height: 10000000px;
+  height: auto;
+  transition: max-height 0.35s ease-out;
+}
 .postlist{
     width: 50%;
     margin: auto;
@@ -54,6 +84,8 @@ a:active {
 }
 
 .postcontent{
+    border-radius: 25px;
+    border: 1px solid #000000;
     width: 80%;
     margin: auto;
 }
@@ -78,29 +110,12 @@ a:active {
     text-align: center;
 }
 
-img {
-  border: 1px solid black;
-    border-radius: 25px;
-}
-
 #commentSend{
     border: 1px solid black;
     border-radius: 20px;
     color: #ffffff;
     background: linear-gradient(#2a475e, #1b2838);
     padding: 10px 10px;
-}
-
-#comment_input {
-    border-radius: 20px;
-    border: 1px solid black;
-    margin:auto;
-    text-align: center;
-}
-
-input[type="text"]
-{
-    font-size:15px;
 }
 
 #commentSend:hover{

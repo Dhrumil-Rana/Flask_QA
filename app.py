@@ -8,6 +8,12 @@ import urllib.request
 import base64
 from werkzeug.utils import secure_filename
 import os
+import requests
+import json
+from datetime import datetime
+import time
+
+
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
@@ -191,7 +197,15 @@ def home():
         commentlist = comments.query.all()
         user = accounts.query.all()
 
-        return render_template('home.html',name=session.get('name'), userlevel=session.get('userlevel'), posts=post, comments=commentlist,users=user)
+        #steam market api
+        # get top 20 csgo market items
+        getAllItems=requests.get('https://steamcommunity.com/market/search/render/?appid=730&norender=1&count=20')
+        allItems=getAllItems.content;
+        allItems=json.loads(allItems);
+        allItems=allItems['results'];
+
+
+        return render_template('home.html',name=session.get('name'), userlevel=session.get('userlevel'), posts=post, comments=commentlist,users=user, items=allItems)
     if request.method =='POST':
         if 'block' in request.form:
             blockpostID=request.form['postID']
@@ -214,6 +228,35 @@ def home():
         return redirect('home')
 # return a list of post and gian has to make a css file such that it will show in sequence
 
+@app.route('/profile/<name>', methods=['POST', 'GET'])
+@login_required
+def profile(name):
+    if request.method == 'GET':
+        userid=db.session.query(accounts.userID).filter_by(username=name).first()
+        post = db.session.query(posts).filter_by(uID=userid).all()
+        commentlist = comments.query.all()
+        user = accounts.query.all()
+        return render_template('profile.html',profilepagename=name,name=session.get('name'), userlevel=session.get('userlevel'), posts=post, comments=commentlist,users=user)
+    if request.method =='POST':
+        if 'block' in request.form:
+            blockpostID=request.form['postID']
+            #print("blocking post"+ blockpostID)
+            blockpost = posts.query.filter_by(postID=blockpostID).first()
+            blockpost.blocked = 'true'
+            db.session.commit()
+
+        post = posts.query.all()
+        commentlist = comments.query.all()
+        user = accounts.query.all()
+
+        if 'comment' in request.form:
+            userID = db.session.query(accounts.userID).filter_by(username=session.get('name')).first()
+            commenttext=request.form['comment_input']
+            postID=request.form['postID']
+            commentSEND = comments(textComment=commenttext, commenterID=userID, postID=postID)
+            db.session.add(commentSEND)
+            db.session.commit()
+        return redirect('profile')
 
 @app.route('/Friends', methods=['POST', 'GET'])
 @login_required
@@ -246,8 +289,6 @@ def messanger(name, friendname):
     if request.method == 'GET':
         return render_template("messanger.html", title="Messanger", msgsALL=allmsgs, msgsSent=sentmsgs, msgsReceived=receivedmsgs, sendersID=usersID[0], friend=friendname, friendID=friendsID[0], name=session.get('name'), userlevel=session.get('userlevel'))
 
-
-
 @app.route('/CreatePost', methods=['POST', 'GET'])
 @login_required
 def Post():
@@ -263,7 +304,7 @@ def Post():
             flash('Post requires text')
             return redirect(request.url)
         usertext = request.form['usertext']
-        if 'img' in request.form:
+        if 'img' in request.files:
             image = request.files['img']
             if allowed_file(image.filename):
                 filename = secure_filename(image.filename)
@@ -323,6 +364,23 @@ def search():
         #print(resulted_comments)
     return render_template("search.html", posts=resulted_post, users=resulted_users, everyuser=allusers, search_txt=src, comments=resulted_comments,name=session.get('name'), userlevel=session.get('userlevel'))
 
+@app.route('/TopMarketItems', methods=['POST', 'GET'])
+@login_required
+def topMarketItems():
+    # steam market api
+    # get top 20 csgo market items
+    getAllItems = requests.get('https://steamcommunity.com/market/search/render/?appid=730&norender=1&count=20')
+    allItems = getAllItems.content;
+    allItems = json.loads(allItems);
+    allItems = allItems['results'];
+    print(allItems)
+    return render_template("topMarketItems.html" , items=allItems, name=session.get('name'), userlevel=session.get('userlevel') )
+
+@app.route('/SearchMarketItems', methods=['POST', 'GET'])
+@login_required
+def searchMarketItems():
+    return  render_template("searchMarketItems.html", name=session.get('name'), userlevel=session.get('userlevel') )
+
 #socketio events
 @socketio.on("joined")
 def handle_event_joined(data):
@@ -348,5 +406,5 @@ def handle_sendMessage_event(data):
 
 if __name__ == '__main__':
     socketio.run(app)
-    # socketio.run(app) if local
-    #app.run() if going to deploy to heroku
+    # socketio.run(app) #if local
+    # app.run() #if going to deploy to heroku
