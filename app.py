@@ -13,7 +13,7 @@ app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 ENV = 'prod'
-select_database = 'almin'
+select_database = 'dhrumil'
 
 #this is for localhost
 if ENV == 'dev':
