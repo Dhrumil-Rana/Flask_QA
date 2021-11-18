@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block content %}
-    <h1 class="post">Create Post</h1>
+    <h1 class="post">Create a new post</h1>
 
     <form id="userpost" enctype="multipart/form-data" method="post" title="Post">
         <div class="postfield">
@@ -18,7 +18,7 @@
             <center><img src="data:{{post.mimetype}};base64,{{post.image}}" width="300"/></center>
             </div>
             {% endif %}
-            <input type="submit" value="Post" onclick = "alert('Thanks for Post {{name}}')">
+            <input type="submit" value="Post" onclick = "alert('Your post has been sent, {{name}}')">
         </div><br>
     </form>
 {% endblock %}

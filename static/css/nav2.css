@@ -1,50 +1,71 @@
-.bar ul{
+.bar2 ul{
     list-style-type: none;
     display: flex;
     align-items: center;
     flex-direction: column;
-    float: left;
+    float: right;
     position: fixed;
     top: 0;
-    left: 0;
+    right: 0;
     z-index: 1;
     overflow-x: hidden;
     height: 100%;
+    width: 17%;
     margin-top: 0;
-    margin-left: -3rem;
     background: linear-gradient(#2a475e, #1b2838);
 }
 
-.bar ul li{
+.bar2 ul li{
     width: 100%;
+    margin-right: 10%;
 }
 
-.bar ul li a{
+.bar2 ul li a{
     display: block;
     color: white;
     text-align: center;
-    padding: 14px;
-    font-size: 20px;
-    font-weight: 800;
+    padding: 30px;
+    font-size: 15px;
     text-decoration: none;
 }
 
-
-.bar ul li a span{
-   padding: 9px;
-}
-
-
-
-
-.bar ul li a:hover{
+.bar2 ul li a:hover{
     background: linear-gradient(to bottom, #171a21, #1b2838) fixed;
 }
 
-.bar ul li form{
+.bar2 ul li form{
     alignment: right;
-    margin-left: 12px;
 }
+
+
+h7{
+    text-align: left;
+    min-height: 30px;
+    font-size: small;
+    word-break: normal;
+}
+
+
+
+h8{
+    color: white;
+    font-size: small;
+    word-break: normal;
+}
+
+img {
+  border: 1px solid white;
+    border-radius: 25px;
+}
+
+#itemimg{
+    max-height: 50px;
+    max-width: 50px;
+    border: 1px solid white;
+    float: left;
+    margin-left: 1%;
+}
+
 #searchBtn{
     display: inline-block;
     border: 1px solid black;

@@ -1,0 +1,26 @@
+<head>
+  <link rel="stylesheet" type = "text/css" href="{{ url_for('static' , filename='css/nav2.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+
+<header>
+  <nav class="bar2">
+    <ul>
+        <li class="bar2">
+            <form action="/search" id="navSearch" method="post">
+            <input type="text" name="search" id ="search" placeholder="Search...">
+            <button type="submit"><i class="fa fa-search"></i></button>
+            <!--<button type="submit" id="searchBtn">Search</button>-->
+            </form>
+        <h8>
+            <p>Top 5 CS:GO items currently being sold and bought on the Steam Community Market.</p><br><br>
+        </h8>
+            <h8 style="min-height:15px"><p style="color:white"><span style="float:left">Item Name</span><span style="float:right"> Current Price</span></p><br></h8>
+            {% for item in navMarketItems %}
+                <h7><p style="color:white";><img id="itemimg" src="https://community.akamai.steamstatic.com/economy/image/{{ (item.asset_description).icon_url }}/360fx360f"/><span style="float:left;max-width:70%">{{item.hash_name}}</span>  <span style="color:white;float:right">{{item.sale_price_text}}</span></p></h7>
+                <br><br><br>
+            {% endfor %}
+        </li>
+    </ul>
+  </nav>
+</header>
