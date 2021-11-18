@@ -9,7 +9,7 @@
             Top 20 CS:GO items currently being sold and bought on the Steam community market. <br><br>
     </h1>
     {% for item in items %}
-        <h3><p style="color:black";>{{item.hash_name}} <img src="https://community.akamai.steamstatic.com/economy/image/{{ (item.asset_description).icon_url }}" width="300"/> <span style="color:green">{{item.sale_price_text}}</span></p></h3>
+        <h3><p style="color:black";>{{item.hash_name}} <img src="https://community.akamai.steamstatic.com/economy/image/{{ (item.asset_description).icon_url }}/360fx360f"/> <span style="color:green">{{item.sale_price_text}}</span></p></h3>
     <br>
     {% endfor %}
 {% endblock %}

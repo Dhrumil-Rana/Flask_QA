@@ -12,6 +12,11 @@ h2{
     text-align: center;
     color: white;
 }
+h3{
+    text-align: center;
+    color: white;
+    font-size: smaller;
+}
 a:link {
   color: #66c0f4;
 }
@@ -124,6 +129,11 @@ a:active {
 img {
   border: 1px solid black;
     border-radius: 25px;
+}
+
+#profileimg {
+    border: 1px solid black;
+    border-radius: 50%;
 }
 
 #commentSend{

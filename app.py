@@ -56,11 +56,13 @@ class accounts(db.Model):
     username = db.Column(db.VARCHAR(), unique=True)
     password = db.Column(db.VARCHAR(), unique=False)
     role = db.Column(db.CHAR(1))
+    steamID = db.Column(db.Integer)
 
-    def __init__(self, username, password, role):
+    def __init__(self, username, password, role, steamID):
         self.username = username
         self.password = password
         self.role = role
+        self.steamID = steamID
 
 
 class posts(db.Model):
@@ -231,12 +233,35 @@ def home():
 @app.route('/profile/<name>', methods=['POST', 'GET'])
 @login_required
 def profile(name):
+
+
+    refreshBackpack = requests.get("https://backpack.tf/api/inventory/76561198049424934/status")
+    getUserInfo = requests.get("https://backpack.tf/api/users/info/v1?steamids=76561198049424934&key=6183f13deea7b76faf43ee48")
+    getUserInfo = getUserInfo.content;
+    getUserInfo = json.loads(getUserInfo)
+    getUserInfo = getUserInfo['users']
+    getUserInfo = getUserInfo['76561198049424934']
+
+    #get backpack total value
+    getTotalBackpackValue = getUserInfo['inventory']
+    getTotalBackpackValue = getTotalBackpackValue['730']
+    getTotalBackpackValue = getTotalBackpackValue['value']
+    totalBackpackValue = getTotalBackpackValue
+
+
+    getInvItems = requests.get('https://steamcommunity.com/inventory/76561198049424934/730/2?l=english&count=5000')
+    invItems = getInvItems.content;
+    invItems = json.loads(invItems);
+    invCount = invItems['total_inventory_count'];
+    invItems = invItems['descriptions'];
+
     if request.method == 'GET':
         userid=db.session.query(accounts.userID).filter_by(username=name).first()
         post = db.session.query(posts).filter_by(uID=userid).all()
         commentlist = comments.query.all()
         user = accounts.query.all()
-        return render_template('profile.html',profilepagename=name,name=session.get('name'), userlevel=session.get('userlevel'), posts=post, comments=commentlist,users=user)
+        return render_template('profile.html',userSteamInfo=getUserInfo, backpackValue=totalBackpackValue,invItems=invItems,invCount=invCount,profilepagename=name,name=session.get('name'), userlevel=session.get('userlevel'), posts=post, comments=commentlist,users=user)
+
     if request.method =='POST':
         if 'block' in request.form:
             blockpostID=request.form['postID']
@@ -334,9 +359,10 @@ def addaccount():
     if request.method == 'POST':
         newuserName = request.form['username']
         passIN = request.form['password']
+        newsteamID = request.form['steamid']
         newrole = request.form['role']
         newpassword = bcrypt.hashpw(passIN.encode('utf-8'), bcrypt.gensalt())
-        user = accounts(username= newuserName, password=newpassword.decode('utf-8'), role=newrole)
+        user = accounts(username= newuserName, password=newpassword.decode('utf-8'), role=newrole, steamID=newsteamID)
         db.session.add(user)
         db.session.commit()
         return render_template("addaccount.html", title="Add Account", name=session.get('name'),userlevel=session.get('userlevel'))
@@ -368,12 +394,12 @@ def search():
 @login_required
 def topMarketItems():
     # steam market api
-    # get top 20 csgo market items
+    # pull top 20 market items
+
     getAllItems = requests.get('https://steamcommunity.com/market/search/render/?appid=730&norender=1&count=20')
     allItems = getAllItems.content;
     allItems = json.loads(allItems);
     allItems = allItems['results'];
-    print(allItems)
     return render_template("topMarketItems.html" , items=allItems, name=session.get('name'), userlevel=session.get('userlevel') )
 
 @app.route('/SearchMarketItems', methods=['POST', 'GET'])

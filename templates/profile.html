@@ -6,7 +6,11 @@
 
 {% block content %}
     <h1 style="color:white";>
-            {{profilepagename}}'s Profile.<br><br>
+            <img id="profileimg" src="{{ userSteamInfo.avatar }}" height="100px"/> {{profilepagename}}<br>
+        <center><h3>Known as {{ userSteamInfo.name }} on Steam</h3><br></center>
+    </h1>
+    <h1 style="color:white";>
+            Total Inventory Value is ${{ backpackValue }} with {{ invCount }} items<br><br>
     </h1>
     <section class="accordion">
     <input type="checkbox" name="collapse" id="handle1">
@@ -67,5 +71,16 @@
 
     </div>
     </section>
+
+    <section class="accordion">
+    <input type="checkbox" name="collapse" id="handle2">
+    <h2 class="handle">
+        <label for="handle2">
+            Show {{profilepagename}}'s inventory
+        </label>
+    </h2>
+    <div class="content">
+
+    </div>
 
 {% endblock %}

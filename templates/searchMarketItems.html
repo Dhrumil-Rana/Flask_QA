@@ -1,0 +1,15 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+    <link rel="stylesheet" type = "text/css" href="{{ url_for ('static' , filename='css/home.css') }}">
+{% endblock %}
+
+{% block content %}
+    <h1 class="result">
+            Top results found. <br><br>
+    </h1>
+    {% for item in items %}
+        <h3><p style="color:black";>{{item.hash_name}} <img src="https://community.akamai.steamstatic.com/economy/image/{{ (item.asset_description).icon_url }}/360fx360f" width="300"/> <span style="color:green">{{item.sale_price_text}}</span></p></h3>
+    <br>
+    {% endfor %}
+{% endblock %}
