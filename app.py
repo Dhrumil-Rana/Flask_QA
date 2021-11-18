@@ -256,7 +256,7 @@ def profile(name):
             commentSEND = comments(textComment=commenttext, commenterID=userID, postID=postID)
             db.session.add(commentSEND)
             db.session.commit()
-        return redirect('profile')
+        return redirect(name)
 
 @app.route('/Friends', methods=['POST', 'GET'])
 @login_required
