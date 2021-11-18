@@ -56,7 +56,7 @@ class accounts(db.Model):
     username = db.Column(db.VARCHAR(), unique=True)
     password = db.Column(db.VARCHAR(), unique=False)
     role = db.Column(db.CHAR(1))
-    steamID = db.Column(db.Integer)
+    steamID = db.Column(db.Integer, unique=True)
 
     def __init__(self, username, password, role, steamID):
         self.username = username
@@ -431,6 +431,6 @@ def handle_sendMessage_event(data):
     #print(data)
 
 if __name__ == '__main__':
-    socketio.run(app)
+    app.run()
     # socketio.run(app) #if local
     # app.run() #if going to deploy to heroku
