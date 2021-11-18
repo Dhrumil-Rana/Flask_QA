@@ -56,13 +56,13 @@ class accounts(db.Model):
     username = db.Column(db.VARCHAR(), unique=True)
     password = db.Column(db.VARCHAR(), unique=False)
     role = db.Column(db.CHAR(1))
-    steamID = db.Column(db.Integer, unique=True)
+    steamid = db.Column(db.Integer, unique=True)
 
-    def __init__(self, username, password, role, steamID):
+    def __init__(self, username, password, role, steamid):
         self.username = username
         self.password = password
         self.role = role
-        self.steamID = steamID
+        self.steamid = steamid
 
 
 class posts(db.Model):
