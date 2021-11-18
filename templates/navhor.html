@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{title}}</title>
+    <!--<link rel="stylesheet" href="/static/css/navhor.css" />-->
+    <link rel="stylesheet" type = "text/css" href="{{ url_for('static' , filename='css/navhor.css') }}"> 
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+    {% block css %} {% endblock %}
+</head>
+
+<body>
+    <!-- sidebar start -->
+    <div class="sidebar">
+        <div class="sidebarOption active">
+          <span class="material-icons"> home </span>
+          <h2>Home</h2>
+        </div>
+
+        <div class="sidebarOption">
+            <span class="material-icons"> add_circle_outline </span>
+            <h2>Create Post</h2>
+        </div>
+
+        <div class="sidebarOption">
+            <span class="material-icons"> people </span>
+            <h2>People</h2>
+        </div>
+
+        <div class="sidebarOption">
+            <span class="material-icons">person_add</span>
+            <h2>Add Account</h2>
+        </div>
+
+        <div class="sidebarOption">
+            <span class="material-icons"> block  </span>
+            <h2>Block Post</h2>
+        </div>
+
+        <div class="sidebarOption">
+        <span class="material-icons">logout</span>
+        <h2>Logout</h2>
+        </div>
+
+    </div>
+
+     <!-- sidebar start -->
+    {% block content %} {% endblock %}
+</body>
+
+</html>
