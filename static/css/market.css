@@ -1,0 +1,54 @@
+html{
+    font-family: Georgia, serif;
+    background: linear-gradient(to bottom, #171a21, #1b2838) fixed;
+    margin-right: 20%;
+    margin-left: 20%;
+}
+
+h1{
+    text-align: center;
+    color: white;
+}
+
+h3{
+    background-color: #1e2838;
+    box-shadow: 5px 5px 5px black;
+    padding: 2px 0px 2px 5px;
+    text-align: left;
+    min-height: 130px;
+}
+
+img{
+    max-height: 128px;
+    max-width: 128px;
+    border: 1px solid white;
+    float: left;
+    margin-left: 1%;
+    margin-top: -2%;
+}
+
+#search{
+    border: 1px solid black;
+    border-radius: 20px;
+    margin: auto;
+    text-align: center;
+
+}
+
+#searchBtn{
+    display: inline-block;
+    border: 1px solid black;
+    border-radius: 20px;
+    color: #ffffff;
+    background: linear-gradient(#2a475e, #1b2838);
+    padding: 10px 10px;
+}
+
+#searchBtn:hover{
+    background: linear-gradient(#1a2c3a, #1b2838);
+}
+
+input[type="text"]
+{
+    font-size:20px;
+}

@@ -1,15 +1,15 @@
 {% extends 'layout.html' %}
 
 {% block css %}
-    <link rel="stylesheet" type = "text/css" href="{{ url_for ('static' , filename='css/home.css') }}">
+    <link rel="stylesheet" type = "text/css" href="{{ url_for ('static' , filename='css/market.css') }}">
 {% endblock %}
 
 {% block content %}
     <h1 class="result">
-            Top 20 CS:GO items currently being sold and bought on the Steam community market. <br><br>
+            Top 20 CS:GO items currently being sold and bought on the Steam Community Market. <br><br>
     </h1>
+    <h3 style="min-height:55px"><p style="color:white"><span style="float:left;margin-left:2%">Item Name</span><span style="float:right;margin-right:2%"> Current Price</span></p></h3>
     {% for item in items %}
-        <h3><p style="color:black";>{{item.hash_name}} <img src="https://community.akamai.steamstatic.com/economy/image/{{ (item.asset_description).icon_url }}/360fx360f"/> <span style="color:green">{{item.sale_price_text}}</span></p></h3>
-    <br>
+        <h3><p style="color:white";><img src="https://community.akamai.steamstatic.com/economy/image/{{ (item.asset_description).icon_url }}/360fx360f"/><span style="float:left;margin-top:3%;margin-left:2%">{{item.hash_name}}</span>  <span style="color:white;float:right;margin-top:3%;margin-right:5%">{{item.sale_price_text}}</span></p></h3>
     {% endfor %}
 {% endblock %}

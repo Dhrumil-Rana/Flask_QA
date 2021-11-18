@@ -7,8 +7,20 @@
 {% block content %}
     <h1 style="color:white";>
             <img id="profileimg" src="{{ userSteamInfo.avatar }}" height="100px"/> {{profilepagename}}<br>
-        <center><h3>Known as {{ userSteamInfo.name }} on Steam</h3><br></center>
+        <center><h3>Known as {{ userSteamInfo.name }} on Steam</h3></center>
     </h1>
+    {% if profilepagename!=name %}
+        {% if isFriend=="False" %}
+        <center><form id="addfriendForm" method="post" >
+                            <input type="hidden" id="profilename" name="profilename" value="{{ profilepagename }}">
+                            <input type="hidden" id="addfriend" name="addfriend">
+                            <button id="addfriendbtn" type="submit">Add as a friend</button>
+        </form></center>
+        {% endif %}
+        {% if isFriend=="True" %}
+            <center><h3>You are friends with {{profilepagename}}</h3></center>
+        {% endif %}
+    {% endif %}
     <h1 style="color:white";>
             Total Inventory Value is ${{ backpackValue }} with {{ invCount }} items<br><br>
     </h1>
@@ -48,7 +60,7 @@
                 {% if comment.postID == post.postID %}
                     {% for user in users %}
                         {% if comment.commenterID==user.userID %}
-                            <div class="comments"><h4><p>{{ user.username }}: {{ comment.textComment }}</p></h4></div>
+                            <div class="comments"><h3><p>{{ user.username }}: {{ comment.textComment }}</p></h3></div>
                         {% endif %}
                     {% endfor %}
                 {% endif %}
@@ -81,6 +93,12 @@
     </h2>
     <div class="content">
 
+    <h4 style="min-height:55px"><p style="color:white"><span style="float:left;margin-left:2%">Item Name</span><span style="float:right;margin-right:2%"> Only showing marketable items</span></p></h4>
+    {% for item in invItems %}
+        {% if item.marketable==1 %}
+        <h4><p style="color:white";><img id=itemimg src="https://community.akamai.steamstatic.com/economy/image/{{ item.icon_url }}/360fx360f"/><span style="float:left;margin-top:3%;margin-left:2%">{{item.market_name}}</span>  </p></h4>
+        {% endif %}
+    {% endfor %}
     </div>
 
 {% endblock %}

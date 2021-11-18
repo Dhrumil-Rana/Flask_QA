@@ -47,6 +47,8 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 
+
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -177,7 +179,7 @@ def blockedPosts():
         commentlist = comments.query.all()
         user = accounts.query.all()
         return render_template('blockedposts.html', name=session.get('name'), userlevel=session.get('userlevel'), posts=post,
-                               comments=commentlist, users=user)
+                               comments=commentlist, users=user,navMarketItems=session.get('top5Items'))
     if request.method =='POST':
         if 'unblock' in request.form:
             blockpostID=request.form['postID']
@@ -194,20 +196,26 @@ def blockedPosts():
 @app.route('/home', methods=['POST', 'GET'])
 @login_required
 def home():
+
+    # steam market api
+    # get top 5 csgo market items
+    getAllItems = requests.get('https://steamcommunity.com/market/search/render/?appid=730&norender=1&count=5')
+    allItems = getAllItems.content;
+    allItems = json.loads(allItems);
+    allItems = allItems['results'];
+    session['top5Items']=allItems
+    print(session.get('top5Items'))
+
+
     if request.method == 'GET':
         post = posts.query.all()
         commentlist = comments.query.all()
         user = accounts.query.all()
 
-        #steam market api
-        # get top 20 csgo market items
-        getAllItems=requests.get('https://steamcommunity.com/market/search/render/?appid=730&norender=1&count=20')
-        allItems=getAllItems.content;
-        allItems=json.loads(allItems);
-        allItems=allItems['results'];
 
 
-        return render_template('home.html',name=session.get('name'), userlevel=session.get('userlevel'), posts=post, comments=commentlist,users=user, items=allItems)
+        return render_template('home.html',name=session.get('name'), userlevel=session.get('userlevel'), posts=post, comments=commentlist,users=user, navMarketItems=session.get('top5Items'))
+
     if request.method =='POST':
         if 'block' in request.form:
             blockpostID=request.form['postID']
@@ -257,14 +265,33 @@ def profile(name):
     invCount = invItems['total_inventory_count'];
     invItems = invItems['descriptions'];
 
+    profileid = db.session.query(accounts.userID).filter_by(username=name).first()
+    currentuserid = db.session.query(accounts.userID).filter_by(username=session.get('name')).first()
+    friendExist = db.session.query(friends).filter_by(friendID=profileid,userID=currentuserid).first()
+    if friendExist is not None:
+        isFriend="True"
+    else:
+        isFriend="False"
+
     if request.method == 'GET':
         userid=db.session.query(accounts.userID).filter_by(username=name).first()
         post = db.session.query(posts).filter_by(uID=userid).all()
         commentlist = comments.query.all()
         user = accounts.query.all()
-        return render_template('profile.html',userSteamInfo=getUserInfo, backpackValue=totalBackpackValue,invItems=invItems,invCount=invCount,profilepagename=name,name=session.get('name'), userlevel=session.get('userlevel'), posts=post, comments=commentlist,users=user)
+        return render_template('profile.html',isFriend=isFriend, userSteamInfo=getUserInfo, backpackValue=totalBackpackValue,invItems=invItems,invCount=invCount,profilepagename=name,name=session.get('name'), userlevel=session.get('userlevel'), posts=post, comments=commentlist,users=user, navMarketItems=session.get('top5Items'))
 
     if request.method =='POST':
+        if 'addfriend' in request.form:
+            requestername=session.get('name')
+            requesterID = db.session.query(accounts.userID).filter_by(username=requestername).first()
+            addfriendname=name
+            friendID = db.session.query(accounts.userID).filter_by(username=addfriendname).first()
+            friend = friends(friendID=requesterID,userID=friendID)
+            db.session.add(friend)
+            friend2 = friends(friendID=friendID, userID=requesterID)
+            db.session.add(friend2)
+            db.session.commit()
+
         if 'block' in request.form:
             blockpostID=request.form['postID']
             #print("blocking post"+ blockpostID)
@@ -297,7 +324,7 @@ def friend():
         friendlist.append(f)
     # getting userid then getting friends and filling friendlist
     #print(friendlist)
-    return render_template("friends.html",friends=friendlist, title="Friends", name=session.get('name'), userlevel=session.get('userlevel') )
+    return render_template("friends.html",friends=friendlist, title="Friends", name=session.get('name'), userlevel=session.get('userlevel'),navMarketItems=session.get('top5Items') )
 #return a list of all the friends
 
 
@@ -314,7 +341,7 @@ def messanger(name, friendname):
     #print(allmsgs)
 
     if request.method == 'GET':
-        return render_template("messanger.html", title="Messanger", msgsALL=allmsgs, msgsSent=sentmsgs, msgsReceived=receivedmsgs, sendersID=usersID[0], friend=friendname, friendID=friendsID[0], name=session.get('name'), userlevel=session.get('userlevel'))
+        return render_template("messanger.html", title="Messanger", msgsALL=allmsgs, msgsSent=sentmsgs, msgsReceived=receivedmsgs, sendersID=usersID[0], friend=friendname, friendID=friendsID[0], name=session.get('name'), userlevel=session.get('userlevel'),navMarketItems=session.get('top5Items'))
 
 @app.route('/CreatePost', methods=['POST', 'GET'])
 @login_required
@@ -351,7 +378,7 @@ def Post():
         return redirect(url_for('home'))
     if request.method == 'GET':
         return render_template("createpost.html", title="Create Post", name=session.get('name'),
-                               userlevel=session.get('userlevel'))
+                               userlevel=session.get('userlevel'),navMarketItems=session.get('top5Items'))
 
 
 # gian will add the post through a form post and we will take it and add it to our database
@@ -367,10 +394,10 @@ def addaccount():
         user = accounts(username= newuserName, password=newpassword.decode('utf-8'), role=newrole, steamid=newsteamID)
         db.session.add(user)
         db.session.commit()
-        return render_template("addaccount.html", title="Add Account", name=session.get('name'),userlevel=session.get('userlevel'))
+        return render_template("addaccount.html", title="Add Account", name=session.get('name'),userlevel=session.get('userlevel'),navMarketItems=session.get('top5Items'))
 
     if request.method == 'GET':
-        return render_template("addaccount.html", title="Add Account", name=session.get('name'),userlevel=session.get('userlevel'))
+        return render_template("addaccount.html", title="Add Account", name=session.get('name'),userlevel=session.get('userlevel'),navMarketItems=session.get('top5Items'))
 
 @app.route('/search', methods=['POST', 'GET'])
 @login_required
@@ -390,7 +417,7 @@ def search():
         resulted_comments = comments.query.all()
         allusers = accounts.query.all()
         #print(resulted_comments)
-    return render_template("search.html", posts=resulted_post, users=resulted_users, everyuser=allusers, search_txt=src, comments=resulted_comments,name=session.get('name'), userlevel=session.get('userlevel'))
+    return render_template("search.html", posts=resulted_post, users=resulted_users, everyuser=allusers, search_txt=src, comments=resulted_comments,name=session.get('name'), userlevel=session.get('userlevel'),navMarketItems=session.get('top5Items'))
 
 @app.route('/TopMarketItems', methods=['POST', 'GET'])
 @login_required
@@ -402,12 +429,28 @@ def topMarketItems():
     allItems = getAllItems.content;
     allItems = json.loads(allItems);
     allItems = allItems['results'];
-    return render_template("topMarketItems.html" , items=allItems, name=session.get('name'), userlevel=session.get('userlevel') )
+    return render_template("topMarketItems.html" , items=allItems, name=session.get('name'), userlevel=session.get('userlevel'),navMarketItems=session.get('top5Items'))
 
 @app.route('/SearchMarketItems', methods=['POST', 'GET'])
 @login_required
 def searchMarketItems():
-    return  render_template("searchMarketItems.html", name=session.get('name'), userlevel=session.get('userlevel') )
+    if request.method =='GET':
+        return render_template("searchMarketItems.html", name=session.get('name'), userlevel=session.get('userlevel'))
+    if request.method =='POST':
+        searchTerm = request.form['search']
+        getAllItems = requests.get('https://steamcommunity.com/market/search/render/?query='+searchTerm+'&category_730_ItemSet%5B%5D=any&category_730_ProPlayer%5B%5D=any&category_730_StickerCapsule%5B%5D=any&category_730_TournamentTeam%5B%5D=any&category_730_Weapon%5B%5D=any&appid=730&norender=1')
+        allItems = getAllItems.content;
+        allItems = json.loads(allItems);
+        allItems = allItems['results'];
+        empty='not'
+        if allItems==[]:
+            print("empty")
+            empty='empty'
+            return render_template("searchMarketItems.html", empty=empty, searchedTerm=searchTerm, items=allItems,
+                                   name=session.get('name'), userlevel=session.get('userlevel'))
+
+
+    return  render_template("searchMarketItems.html",searchedTerm=searchTerm, items=allItems, name=session.get('name'), userlevel=session.get('userlevel'),navMarketItems=session.get('top5Items'))
 
 #socketio events
 @socketio.on("joined")

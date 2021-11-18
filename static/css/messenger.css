@@ -1,7 +1,7 @@
 html{
     font-family: Georgia, serif;
-    background-image: linear-gradient(45deg, #a84fff, #9c30ff);
-    color: #000000;
+    background: linear-gradient(to bottom, #171a21, #1b2838) fixed;
+    color: white;
     text-align: center;
 }
 
@@ -15,17 +15,20 @@ h1{
     height: 500px;
     word-break: break-word;
     overflow: auto;
-    background: #cccccc;
-    border: 1px solid #760e7a;
+    background: linear-gradient(#2a475e, #1b2838);
+    border: 1px solid black;
+    border-radius: 25px;
 }
 
 .usermsg{
     height: 30px;
     text-align: right;
     vertical-align: bottom;
+    margin: 4px;
 }
 
 .friendmsg{
     text-align: left;
     vertical-align: bottom;
+    margin: 4px;
 }
