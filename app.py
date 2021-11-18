@@ -56,7 +56,7 @@ class accounts(db.Model):
     username = db.Column(db.VARCHAR(), unique=True)
     password = db.Column(db.VARCHAR(), unique=False)
     role = db.Column(db.CHAR(1))
-    steamid = db.Column(db.Integer, unique=True)
+    steamid = db.Column(db.VARCHAR(), unique=True)
 
     def __init__(self, username, password, role, steamid):
         self.username = username
@@ -362,7 +362,7 @@ def addaccount():
         newsteamID = request.form['steamid']
         newrole = request.form['role']
         newpassword = bcrypt.hashpw(passIN.encode('utf-8'), bcrypt.gensalt())
-        user = accounts(username= newuserName, password=newpassword.decode('utf-8'), role=newrole, steamID=newsteamID)
+        user = accounts(username= newuserName, password=newpassword.decode('utf-8'), role=newrole, steamid=newsteamID)
         db.session.add(user)
         db.session.commit()
         return render_template("addaccount.html", title="Add Account", name=session.get('name'),userlevel=session.get('userlevel'))
@@ -432,5 +432,6 @@ def handle_sendMessage_event(data):
 
 if __name__ == '__main__':
     app.run()
+
     # socketio.run(app) #if local
     # app.run() #if going to deploy to heroku
