@@ -1,16 +1,16 @@
 html{
     font-family: Georgia, serif;
-    background: #a84fff;
+    background: linear-gradient(to bottom, #171a21, #1b2838) fixed;
 }
 
 h1{
     text-align: center;
-    color: #000000;
+    color: white;
 }
 
 h2{
     text-align: center;
-    color: #000000;
+    color: white;
     font-size: 20px;
 }
 
@@ -20,7 +20,7 @@ h2{
     width: 20%;
     height: 100%;
     padding: 20px;
-    background-image: linear-gradient(45deg, #e861a5, #8A2BE2);
+    background: linear-gradient(#2a475e, #395f7f);
     border-radius: 8px;
 }
 
@@ -31,19 +31,20 @@ label{
 }
 
 input[type=submit]{
-    border: 1px solid rebeccapurple;
+    border: 1px solid black;
     border-radius: 20px;
     color: #ffffff;
-    background-image: linear-gradient(45deg, rebeccapurple, mediumpurple);
+    background: linear-gradient(#2a475e, #1b2838);
     padding: 10px 25px;
-    box-shadow: 5px 5px 5px rebeccapurple;
+    box-shadow: 5px 5px 5px black;
 }
 
 input[type=submit]:hover{
-    background-image: linear-gradient(45deg, #4f2678, #6e53a6);
+    background-image: linear-gradient(#1b2838, #2a475e);
 }
 
 .alert{
+    border-radius: 25px;
     margin: auto;
     width: 30%;
     background: indianred;

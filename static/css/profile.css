@@ -12,7 +12,6 @@ h2{
     text-align: center;
     color: white;
 }
-
 a:link {
   color: #66c0f4;
 }
@@ -26,9 +25,54 @@ a:hover {
 }
 
 a:active {
-  text-decoration: underline;
 }
 
+.accordion > input[name="collapse"] {
+    display:none;
+}
+
+.accordion .content {
+  background: linear-gradient(to bottom, #171a21, #1b2838) fixed;
+  overflow: hidden;
+  max-height: 0;
+  transition: 0.5s;
+  box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.3);
+}
+.accordion label {
+  color: #fff;
+  cursor: pointer;
+  font-weight: normal;
+  background: linear-gradient(#2a475e, #1b2838);
+
+}
+
+.accordion label:hover,
+.accordion label:focus {
+  background: #252525;
+}
+
+.accordion .handle label:before {
+  font-family: FontAwesome;
+  content: "\f107";
+  display: inline-block;
+  margin-right: 10px;
+  font-size: 1em;
+  line-height: 1.556em;
+  vertical-align: middle;
+  transition: 0.4s;
+
+}
+
+.accordion > input[name="collapse"]:checked ~ .handle label:before {
+    transform: rotate(180deg);
+    transform-origin: center;
+    transition: 0.4s;
+}
+.accordion > input[name="collapse"]:checked ~ .content {
+    max-height: 10000000px;
+  height: auto;
+  transition: max-height 0.35s ease-out;
+}
 .postlist{
     width: 50%;
     margin: auto;
@@ -77,7 +121,6 @@ a:active {
     margin: auto;
     text-align: center;
 }
-
 img {
   border: 1px solid black;
     border-radius: 25px;
@@ -89,18 +132,6 @@ img {
     color: #ffffff;
     background: linear-gradient(#2a475e, #1b2838);
     padding: 10px 10px;
-}
-
-#comment_input {
-    border-radius: 20px;
-    border: 1px solid black;
-    margin:auto;
-    text-align: center;
-}
-
-input[type="text"]
-{
-    font-size:15px;
 }
 
 #commentSend:hover{

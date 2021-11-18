@@ -1,19 +1,35 @@
 html{
     font-family: Georgia, serif;
-    background-image: linear-gradient(45deg, #a84fff, #9c30ff);
-    color: #000000;
+    background: linear-gradient(to bottom, #171a21, #1b2838) fixed;
+    color: white;
     text-align: center;
 }
 
 h1{
     text-align: center;
 }
+a:link {
+  color: #66c0f4;
+}
+
+a:visited {
+  color: #66c0f4;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+a:active {
+  text-decoration: underline;
+}
 
 .friendslist{
+    border-radius: 25px;
     margin: auto;
     height: 500px;
     width: 30%;
-    background: #cccccc;
+    background: linear-gradient(#2a475e, #1b2838);
     overflow: auto;
-    border: 1px solid #760e7a;
+    border: 1px solid black;
 }
