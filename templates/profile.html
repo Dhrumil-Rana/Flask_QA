@@ -96,7 +96,7 @@
     <h4 style="min-height:55px"><p style="color:white"><span style="float:left;margin-left:2%">Item Name</span><span style="float:right;margin-right:2%"> Only showing marketable items</span></p></h4>
     {% for item in invItems %}
         {% if item.marketable==1 %}
-        <h4><p style="color:white";><img id=itemimg src="https://community.akamai.steamstatic.com/economy/image/{{ item.icon_url }}/360fx360f"/><span style="float:left;margin-top:3%;margin-left:2%">{{item.market_name}}</span>  </p></h4>
+        <h4><p style="color:white";><img id=itemimg2 src="https://community.akamai.steamstatic.com/economy/image/{{ item.icon_url }}/360fx360f"/><span style="float:left;margin-top:3%;margin-left:2%">{{item.market_name}}</span>  </p></h4>
         {% endif %}
     {% endfor %}
     </div>
