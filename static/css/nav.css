@@ -1,38 +1,42 @@
 .bar ul{
     list-style-type: none;
-    margin: 0;
-    width: 100%;
-    padding: 0;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
     position: fixed;
     top: 0;
     left: 0;
-    overflow: hidden;
+    z-index: 1;
+    overflow-x: hidden;
+    height: 100%;
+    margin-top: 0;
+    margin-left: -3rem;
     background: linear-gradient(#2a475e, #1b2838);
 }
 
 .bar ul li{
-    float: left;
+    width: 100%;
 }
 
 .bar ul li a{
     display: block;
     color: white;
     text-align: center;
-    padding: 14px 16px;
+    padding: 30px;
+    font-size: 20px;
+    font-weight: 800;
     text-decoration: none;
-    border-left: 1px solid #000000;
 }
 
 .bar ul li a:hover{
     background: linear-gradient(to bottom, #171a21, #1b2838) fixed;
 }
 
-#search{
+.bar ul li form{
     alignment: right;
+    margin-left: 12px;
 }
 #searchBtn{
-    margin-top: 3px;
-    margin-right: 3px;
     display: inline-block;
     border: 1px solid black;
     border-radius: 20px;
@@ -43,8 +47,4 @@
 
 #searchBtn:hover{
     background: linear-gradient(#1a2c3a, #1b2838);
-}
-
-body{
-    padding-top: 50px;
 }
