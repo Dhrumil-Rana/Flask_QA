@@ -243,42 +243,63 @@ def home():
 def profile(name):
 
     usersteamidRESULT = db.session.query(accounts.steamid).filter_by(username=name).first()
-    usersteamid=usersteamidRESULT[0]
-    #refreshBackpack = requests.get("https://backpack.tf/api/inventory/76561198049424934/status")
-    refreshBackpack = requests.get("https://backpack.tf/api/inventory/"+usersteamid+"/status")
-    getUserInfo = requests.get("https://backpack.tf/api/users/info/v1?steamids="+usersteamid+"&key=6183f13deea7b76faf43ee48")
-    getUserInfo = getUserInfo.content;
-    getUserInfo = json.loads(getUserInfo)
-    getUserInfo = getUserInfo['users']
-    getUserInfo = getUserInfo[usersteamid]
+    if str(usersteamidRESULT[0]) != "None":
+        usersteamid=usersteamidRESULT[0]
+        #refreshBackpack = requests.get("https://backpack.tf/api/inventory/76561198049424934/status")
+        refreshBackpack = requests.get("https://backpack.tf/api/inventory/"+usersteamid+"/status")
+        getUserInfo = requests.get("https://backpack.tf/api/users/info/v1?steamids="+usersteamid+"&key=6183f13deea7b76faf43ee48")
+        getUserInfo = getUserInfo.content;
+        getUserInfo = json.loads(getUserInfo)
+        getUserInfo = getUserInfo['users']
+        getUserInfo = getUserInfo[usersteamid]
 
-    #get backpack total value
-    getTotalBackpackValue = getUserInfo['inventory']
-    getTotalBackpackValue = getTotalBackpackValue['730']
-    getTotalBackpackValue = getTotalBackpackValue['value']
-    totalBackpackValue = getTotalBackpackValue
+        #get backpack total value
+        getTotalBackpackValue = getUserInfo['inventory']
+        getTotalBackpackValue = getTotalBackpackValue['730']
+        getTotalBackpackValue = getTotalBackpackValue['value']
+        totalBackpackValue = getTotalBackpackValue
 
 
-    getInvItems = requests.get('https://steamcommunity.com/inventory/'+usersteamid+'/730/2?l=english&count=5000')
-    invItems = getInvItems.content;
-    invItems = json.loads(invItems);
-    invCount = invItems['total_inventory_count'];
-    invItems = invItems['descriptions'];
+        getInvItems = requests.get('https://steamcommunity.com/inventory/'+usersteamid+'/730/2?l=english&count=5000')
+        invItems = getInvItems.content;
+        invItems = json.loads(invItems);
+        invCount = invItems['total_inventory_count'];
+        invItems = invItems['descriptions'];
 
-    profileid = db.session.query(accounts.userID).filter_by(username=name).first()
-    currentuserid = db.session.query(accounts.userID).filter_by(username=session.get('name')).first()
-    friendExist = db.session.query(friends).filter_by(friendID=profileid,userID=currentuserid).first()
-    if friendExist is not None:
-        isFriend="True"
+        profileid = db.session.query(accounts.userID).filter_by(username=name).first()
+        currentuserid = db.session.query(accounts.userID).filter_by(username=session.get('name')).first()
+        friendExist = db.session.query(friends).filter_by(friendID=profileid,userID=currentuserid).first()
+        if friendExist is not None:
+            isFriend="True"
+        else:
+            isFriend="False"
+
+        if request.method == 'GET':
+            userid=db.session.query(accounts.userID).filter_by(username=name).first()
+            post = db.session.query(posts).filter_by(uID=userid).all()
+            commentlist = comments.query.all()
+            user = accounts.query.all()
+            return render_template('profile.html',isFriend=isFriend, userSteamInfo=getUserInfo, backpackValue=totalBackpackValue,invItems=invItems,invCount=invCount,profilepagename=name,name=session.get('name'), userlevel=session.get('userlevel'), posts=post, comments=commentlist,users=user, navMarketItems=session.get('top5Items'))
+
     else:
-        isFriend="False"
 
-    if request.method == 'GET':
-        userid=db.session.query(accounts.userID).filter_by(username=name).first()
-        post = db.session.query(posts).filter_by(uID=userid).all()
-        commentlist = comments.query.all()
-        user = accounts.query.all()
-        return render_template('profile.html',isFriend=isFriend, userSteamInfo=getUserInfo, backpackValue=totalBackpackValue,invItems=invItems,invCount=invCount,profilepagename=name,name=session.get('name'), userlevel=session.get('userlevel'), posts=post, comments=commentlist,users=user, navMarketItems=session.get('top5Items'))
+        profileid = db.session.query(accounts.userID).filter_by(username=name).first()
+        currentuserid = db.session.query(accounts.userID).filter_by(username=session.get('name')).first()
+        friendExist = db.session.query(friends).filter_by(friendID=profileid, userID=currentuserid).first()
+        if friendExist is not None:
+            isFriend = "True"
+        else:
+            isFriend = "False"
+
+        if request.method == 'GET':
+            userid = db.session.query(accounts.userID).filter_by(username=name).first()
+            post = db.session.query(posts).filter_by(uID=userid).all()
+            commentlist = comments.query.all()
+            user = accounts.query.all()
+            return render_template('profile.html', isFriend=isFriend,
+                                   profilepagename=name, name=session.get('name'), userlevel=session.get('userlevel'),
+                                   posts=post, comments=commentlist, users=user,
+                                   navMarketItems=session.get('top5Items'), steamResult='False')
 
     if request.method =='POST':
         if 'addfriend' in request.form:

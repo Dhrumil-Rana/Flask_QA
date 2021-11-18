@@ -6,8 +6,10 @@
 
 {% block content %}
     <h1 style="color:white";>
+            {% if steamResult != 'False' %}
             <img id="profileimg" src="{{ userSteamInfo.avatar }}" height="100px"/> {{profilepagename}}<br>
         <center><h3>Known as {{ userSteamInfo.name }} on Steam</h3></center>
+            {%  endif %}
     </h1>
     {% if profilepagename!=name %}
         {% if isFriend=="False" %}
