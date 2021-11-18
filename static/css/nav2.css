@@ -10,12 +10,14 @@
     z-index: 1;
     overflow-x: hidden;
     height: 100%;
+    width: 17%;
     margin-top: 0;
     background: linear-gradient(#2a475e, #1b2838);
 }
 
 .bar2 ul li{
     width: 100%;
+    margin-right: 10%;
 }
 
 .bar2 ul li a{
@@ -23,8 +25,7 @@
     color: white;
     text-align: center;
     padding: 30px;
-    font-size: 20px;
-    font-weight: 800;
+    font-size: 15px;
     text-decoration: none;
 }
 
@@ -38,31 +39,30 @@
 
 
 h7{
-    background-color: #1e2838;
-    box-shadow: 5px 5px 5px black;
-    padding: 2px 0px 2px 2px;
     text-align: left;
     min-height: 30px;
+    font-size: small;
+    word-break: normal;
 }
+
 h8{
     color: white;
     font-size: small;
+    word-break: normal;
 }
 
 img {
-  border: 1px solid black;
+  border: 1px solid white;
     border-radius: 25px;
 }
 
 #itemimg{
-    max-height: 54px;
-    max-width: 54px;
+    max-height: 50px;
+    max-width: 50px;
     border: 1px solid white;
     float: left;
     margin-left: 1%;
-    margin-top: -2%;
 }
-
 
 #searchBtn{
     display: inline-block;
