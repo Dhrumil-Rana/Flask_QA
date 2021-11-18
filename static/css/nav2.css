@@ -35,6 +35,35 @@
 .bar2 ul li form{
     alignment: right;
 }
+
+
+h7{
+    background-color: #1e2838;
+    box-shadow: 5px 5px 5px black;
+    padding: 2px 0px 2px 2px;
+    text-align: left;
+    min-height: 30px;
+}
+h8{
+    color: white;
+    font-size: small;
+}
+
+img {
+  border: 1px solid black;
+    border-radius: 25px;
+}
+
+#itemimg{
+    max-height: 54px;
+    max-width: 54px;
+    border: 1px solid white;
+    float: left;
+    margin-left: 1%;
+    margin-top: -2%;
+}
+
+
 #searchBtn{
     display: inline-block;
     border: 1px solid black;

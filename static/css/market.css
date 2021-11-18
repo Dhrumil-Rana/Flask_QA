@@ -26,3 +26,29 @@ img{
     margin-left: 1%;
     margin-top: -2%;
 }
+
+#search{
+    border: 1px solid black;
+    border-radius: 20px;
+    margin: auto;
+    text-align: center;
+
+}
+
+#searchBtn{
+    display: inline-block;
+    border: 1px solid black;
+    border-radius: 20px;
+    color: #ffffff;
+    background: linear-gradient(#2a475e, #1b2838);
+    padding: 10px 10px;
+}
+
+#searchBtn:hover{
+    background: linear-gradient(#1a2c3a, #1b2838);
+}
+
+input[type="text"]
+{
+    font-size:20px;
+}
