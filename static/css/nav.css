@@ -27,8 +27,12 @@
     background: linear-gradient(to bottom, #171a21, #1b2838) fixed;
 }
 
+#search{
+    alignment: right;
+}
 #searchBtn{
     margin-top: 3px;
+    margin-right: 3px;
     display: inline-block;
     border: 1px solid black;
     border-radius: 20px;

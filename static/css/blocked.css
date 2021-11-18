@@ -1,12 +1,28 @@
 html{
     font-family: Georgia, serif;
-    background-image: linear-gradient(45deg, #a84fff, #9c30ff);
-    color: #000000;
+    background: linear-gradient(to bottom, #171a21, #1b2838) fixed;
+    color: white;
     text-align: center;
 }
 
 h1{
-    color: #000000;
+    color: white;
+}
+
+a:link {
+  color: #66c0f4;
+}
+
+a:visited {
+  color: #66c0f4;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+a:active {
+  text-decoration: underline;
 }
 
 .postlist{
@@ -16,12 +32,24 @@ h1{
 }
 
 .currpost{
-    border: 3px solid #000000;
-    background: #cccccc;
+    border-radius: 25px;
+    border: 1px solid #000000;
+    background: linear-gradient(#2a475e, #1b2838);
+}
+
+.currpost button{
+    border: 1px solid black;
+    border-radius: 20px;
+    color: #ffffff;
+    background-image: linear-gradient(45deg, #d72b2b, #ff2e2e);
+    padding: 10px 10px;
+}
+
+.currpost button:hover{
+    background-image: linear-gradient(45deg, #bd1010, #c92424);
 }
 
 .postcontent{
-    border: 2px solid #000000;
     width: 80%;
     margin: auto;
 }
@@ -32,11 +60,13 @@ h1{
 }
 
 .comments{
+    color: white;
+    border-radius: 25px;
     border: 1px solid #000000;
     width: 99%;
     margin: auto;
     overflow: auto;
-    background: #c958e7;
+    background: linear-gradient(#2a475e, #395f7f);
 }
 
 .sendcomment{
