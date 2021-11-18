@@ -234,13 +234,15 @@ def home():
 @login_required
 def profile(name):
 
-
-    refreshBackpack = requests.get("https://backpack.tf/api/inventory/76561198049424934/status")
-    getUserInfo = requests.get("https://backpack.tf/api/users/info/v1?steamids=76561198049424934&key=6183f13deea7b76faf43ee48")
+    usersteamidRESULT = db.session.query(accounts.steamid).filter_by(username=name).first()
+    usersteamid=usersteamidRESULT[0]
+    #refreshBackpack = requests.get("https://backpack.tf/api/inventory/76561198049424934/status")
+    refreshBackpack = requests.get("https://backpack.tf/api/inventory/"+usersteamid+"/status")
+    getUserInfo = requests.get("https://backpack.tf/api/users/info/v1?steamids="+usersteamid+"&key=6183f13deea7b76faf43ee48")
     getUserInfo = getUserInfo.content;
     getUserInfo = json.loads(getUserInfo)
     getUserInfo = getUserInfo['users']
-    getUserInfo = getUserInfo['76561198049424934']
+    getUserInfo = getUserInfo[usersteamid]
 
     #get backpack total value
     getTotalBackpackValue = getUserInfo['inventory']
@@ -249,7 +251,7 @@ def profile(name):
     totalBackpackValue = getTotalBackpackValue
 
 
-    getInvItems = requests.get('https://steamcommunity.com/inventory/76561198049424934/730/2?l=english&count=5000')
+    getInvItems = requests.get('https://steamcommunity.com/inventory/'+usersteamid+'/730/2?l=english&count=5000')
     invItems = getInvItems.content;
     invItems = json.loads(invItems);
     invCount = invItems['total_inventory_count'];
