@@ -243,7 +243,7 @@ def home():
 def profile(name):
 
     usersteamidRESULT = db.session.query(accounts.steamid).filter_by(username=name).first()
-    if str(usersteamidRESULT[0]) != "None":
+    if usersteamidRESULT[0] != "None":
         usersteamid=usersteamidRESULT[0]
         #refreshBackpack = requests.get("https://backpack.tf/api/inventory/76561198049424934/status")
         refreshBackpack = requests.get("https://backpack.tf/api/inventory/"+usersteamid+"/status")
