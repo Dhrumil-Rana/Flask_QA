@@ -497,7 +497,7 @@ def handle_sendMessage_event(data):
     #print(data)
 
 if __name__ == '__main__':
-    socketio.run(app)
+    #socketio.run(app)
 
     # socketio.run(app) #if local
-    # app.run() #if going to deploy to heroku
+    app.run() #if going to deploy to heroku
