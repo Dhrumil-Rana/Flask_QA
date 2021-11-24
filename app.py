@@ -154,6 +154,15 @@ def login():
         if user:
             # compare password given to database hash
             if bcrypt.checkpw(passwordIN, user.password.encode('utf-8')):
+                # steam market api
+                # get top 5 csgo market items and set for session
+                getAllItems = requests.get(
+                    'https://steamcommunity.com/market/search/render/?appid=730&norender=1&count=5')
+                allItems = getAllItems.content;
+                allItems = json.loads(allItems);
+                allItems = allItems['results'];
+                session['top5Items'] = allItems
+                print(session.get('top5Items'))
                 if user.role == 'U':
                     session['logged_in']=True
                     session['name']=request.form['username']
@@ -196,17 +205,6 @@ def blockedPosts():
 @app.route('/home', methods=['POST', 'GET'])
 @login_required
 def home():
-
-    # steam market api
-    # get top 5 csgo market items
-    getAllItems = requests.get('https://steamcommunity.com/market/search/render/?appid=730&norender=1&count=5')
-    allItems = getAllItems.content;
-    allItems = json.loads(allItems);
-    allItems = allItems['results'];
-    session['top5Items']=allItems
-    print(session.get('top5Items'))
-
-
     if request.method == 'GET':
         post = posts.query.all()
         commentlist = comments.query.all()
@@ -417,7 +415,7 @@ def search():
         resulted_comments = comments.query.all()
         allusers = accounts.query.all()
         #print(resulted_comments)
-    return render_template("search.html", posts=resulted_post, users=resulted_users, everyuser=allusers, search_txt=src, comments=resulted_comments,name=session.get('name'), userlevel=session.get('userlevel'),navMarketItems=session.get('top5Items'))
+    return render_template("search.html", posts=resulted_post, users=resulted_users, everyuser=allusers, search_txt=src, comments=resulted_comments,name=session.get('name'), userlevel=session.get('userlevel'), navMarketItems=session.get('top5Items'))
 
 @app.route('/TopMarketItems', methods=['POST', 'GET'])
 @login_required
@@ -435,7 +433,7 @@ def topMarketItems():
 @login_required
 def searchMarketItems():
     if request.method =='GET':
-        return render_template("searchMarketItems.html", name=session.get('name'), userlevel=session.get('userlevel'))
+        return render_template("searchMarketItems.html", name=session.get('name'), userlevel=session.get('userlevel'),navMarketItems=session.get('top5Items'))
     if request.method =='POST':
         searchTerm = request.form['search']
         getAllItems = requests.get('https://steamcommunity.com/market/search/render/?query='+searchTerm+'&category_730_ItemSet%5B%5D=any&category_730_ProPlayer%5B%5D=any&category_730_StickerCapsule%5B%5D=any&category_730_TournamentTeam%5B%5D=any&category_730_Weapon%5B%5D=any&appid=730&norender=1')
@@ -447,7 +445,7 @@ def searchMarketItems():
             print("empty")
             empty='empty'
             return render_template("searchMarketItems.html", empty=empty, searchedTerm=searchTerm, items=allItems,
-                                   name=session.get('name'), userlevel=session.get('userlevel'))
+                                   name=session.get('name'), userlevel=session.get('userlevel'),navMarketItems=session.get('top5Items'))
 
 
     return  render_template("searchMarketItems.html",searchedTerm=searchTerm, items=allItems, name=session.get('name'), userlevel=session.get('userlevel'),navMarketItems=session.get('top5Items'))
