@@ -2,16 +2,11 @@ from flask import Flask,request,render_template,session,redirect,url_for,flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO, send, emit, ConnectionRefusedError, join_room
 from functools import wraps
-import pickle
 import bcrypt
-import urllib.request
 import base64
 from werkzeug.utils import secure_filename
-import os
 import requests
 import json
-from datetime import datetime
-import time
 
 
 
@@ -143,9 +138,29 @@ def logout():
     return redirect(url_for('login'))
 
 
-@app.route('/login',methods=['POST', 'GET'])
+@app.route('/register',methods=['POST', 'GET'])
+def register():
+
+    if request.method == 'GET':
+        return render_template("register.html", title="Register Page")
+
+    if request.method == 'POST' and 'username' in request.form and 'pasword' in request.form and 'steamid' in request.form:
+        newuserName = request.form['username']
+        passIN = request.form['password']
+        newsteamID = request.form['steamid']
+        newpassword = bcrypt.hashpw(passIN.encode('utf-8'), bcrypt.gensalt())
+        user = accounts(username=newuserName, password=newpassword.decode('utf-8'), role='U', steamid=newsteamID)
+        db.session.add(user)
+        db.session.commit()
+        return render_template("login.html", title="Login Page")
+    else:
+        return redirect(url_for('register'))
+
+
+
+@app.route('/login', methods=['POST', 'GET'])
 def login():
-    if request.method=='POST':
+    if request.method == 'POST':
         nameIN = request.form['username']
         passwordIN = request.form['password'].encode('utf-8')
 
@@ -168,7 +183,7 @@ def login():
                 return render_template('login.html', info='Password incorrect.')
         else:
             return render_template('login.html', info='Account with that username does not exist.')
-    if request.method=='GET':
+    if request.method == 'GET':
         return render_template('login.html')
 
 @app.route('/blockedPosts', methods=['POST', 'GET'])
@@ -421,6 +436,10 @@ def addaccount():
     if request.method == 'GET':
         return render_template("addaccount.html", title="Add Account", name=session.get('name'),userlevel=session.get('userlevel'),navMarketItems=session.get('top5Items'))
 
+
+
+
+
 @app.route('/search', methods=['POST', 'GET'])
 @login_required
 def search():
@@ -498,7 +517,6 @@ def handle_sendMessage_event(data):
     #print(data)
 
 if __name__ == '__main__':
-    #socketio.run(app)
 
-    # socketio.run(app) #if local
+    #socketio.run(app) #if local
     app.run() #if going to deploy to heroku
