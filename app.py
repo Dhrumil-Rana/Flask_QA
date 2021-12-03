@@ -14,7 +14,7 @@ app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 ENV = 'prod'
-select_database = 'almin'
+select_database = 'dhrumil'
 
 #this is for localhost
 if ENV == 'dev':
@@ -144,7 +144,7 @@ def register():
     if request.method == 'GET':
         return render_template("register.html", title="Register Page")
 
-    if request.method == 'POST' and 'username' in request.form and 'pasword' in request.form and 'steamid' in request.form:
+    if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'steamid' in request.form:
         newuserName = request.form['username']
         passIN = request.form['password']
         newsteamID = request.form['steamid']
@@ -219,22 +219,16 @@ def home():
     allItems = json.loads(allItems);
     allItems = allItems['results'];
     session['top5Items']=allItems
-    print(session.get('top5Items'))
-
 
     if request.method == 'GET':
         post = posts.query.all()
         commentlist = comments.query.all()
         user = accounts.query.all()
-
-
-
         return render_template('home.html',name=session.get('name'), userlevel=session.get('userlevel'), posts=post, comments=commentlist,users=user, navMarketItems=session.get('top5Items'))
 
-    if request.method =='POST':
+    if request.method == 'POST':
         if 'block' in request.form:
             blockpostID=request.form['postID']
-            #print("blocking post"+ blockpostID)
             blockpost = posts.query.filter_by(postID=blockpostID).first()
             blockpost.blocked = 'true'
             db.session.commit()
@@ -274,7 +268,6 @@ def profile(name):
         getTotalBackpackValue = getTotalBackpackValue['730']
         getTotalBackpackValue = getTotalBackpackValue['value']
         totalBackpackValue = getTotalBackpackValue
-
 
         getInvItems = requests.get('https://steamcommunity.com/inventory/'+usersteamid+'/730/2?l=english&count=5000')
         invItems = getInvItems.content;

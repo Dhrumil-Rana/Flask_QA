@@ -8,7 +8,7 @@
     <body>
     {{ Message }}
     <h1 class="post">Register</h1>
-    <form id="signin" method="post" title="Register">
+    <form id="signin" method="POST" title="Register">
             <div class="submission">
                 <label>Create a new account</label><br><br>
                 <label for="username">Username</label><br>
@@ -16,7 +16,8 @@
                 <label for="password">Password</label><br>
                 <input type="password" required placeholder="Enter password" id="password" name='password'><br><br>
                 <label for="steamid">Steam ID</label><br>
-                <input type="steamid" required placeholder="Enter Steam ID" id="steamid" name='steamid'><br><br><br>
+                <input type="steamid" required placeholder="Enter Steam ID" id="steamid" name='steamid'><br>
+                <p style="color:white;">Steam profile and inventory must be public</p>
                 <input type="submit" value="Register">
             </div><br>
         </form>
