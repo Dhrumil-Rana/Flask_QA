@@ -19,7 +19,7 @@ app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 ENV = 'prod'
-select_database = 'dhrumil'
+select_database = 'almin'
 
 #this is for localhost
 if ENV == 'dev':
@@ -243,7 +243,8 @@ def home():
 def profile(name):
 
     usersteamidRESULT = db.session.query(accounts.steamid).filter_by(username=name).first()
-    if usersteamidRESULT[0] != "None":
+    result=str(usersteamidRESULT[0])
+    if result != "None":
         usersteamid=usersteamidRESULT[0]
         #refreshBackpack = requests.get("https://backpack.tf/api/inventory/76561198049424934/status")
         refreshBackpack = requests.get("https://backpack.tf/api/inventory/"+usersteamid+"/status")
