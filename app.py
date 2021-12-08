@@ -2,16 +2,11 @@ from flask import Flask,request,render_template,session,redirect,url_for,flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO, send, emit, ConnectionRefusedError, join_room
 from functools import wraps
-import pickle
 import bcrypt
-import urllib.request
 import base64
 from werkzeug.utils import secure_filename
-import os
 import requests
 import json
-from datetime import datetime
-import time
 
 
 
@@ -143,9 +138,29 @@ def logout():
     return redirect(url_for('login'))
 
 
-@app.route('/login',methods=['POST', 'GET'])
+@app.route('/register',methods=['POST', 'GET'])
+def register():
+
+    if request.method == 'GET':
+        return render_template("register.html", title="Register Page")
+
+    if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'steamid' in request.form:
+        newuserName = request.form['username']
+        passIN = request.form['password']
+        newsteamID = request.form['steamid']
+        newpassword = bcrypt.hashpw(passIN.encode('utf-8'), bcrypt.gensalt())
+        user = accounts(username=newuserName, password=newpassword.decode('utf-8'), role='U', steamid=newsteamID)
+        db.session.add(user)
+        db.session.commit()
+        return render_template("login.html", title="Login Page")
+    else:
+        return redirect(url_for('register'))
+
+
+
+@app.route('/login', methods=['POST', 'GET'])
 def login():
-    if request.method=='POST':
+    if request.method == 'POST':
         nameIN = request.form['username']
         passwordIN = request.form['password'].encode('utf-8')
 
@@ -154,15 +169,6 @@ def login():
         if user:
             # compare password given to database hash
             if bcrypt.checkpw(passwordIN, user.password.encode('utf-8')):
-                # steam market api
-                # get top 5 csgo market items and set for session
-                getAllItems = requests.get(
-                    'https://steamcommunity.com/market/search/render/?appid=730&norender=1&count=5')
-                allItems = getAllItems.content;
-                allItems = json.loads(allItems);
-                allItems = allItems['results'];
-                session['top5Items'] = allItems
-                print(session.get('top5Items'))
                 if user.role == 'U':
                     session['logged_in']=True
                     session['name']=request.form['username']
@@ -177,7 +183,7 @@ def login():
                 return render_template('login.html', info='Password incorrect.')
         else:
             return render_template('login.html', info='Account with that username does not exist.')
-    if request.method=='GET':
+    if request.method == 'GET':
         return render_template('login.html')
 
 @app.route('/blockedPosts', methods=['POST', 'GET'])
@@ -205,19 +211,24 @@ def blockedPosts():
 @app.route('/home', methods=['POST', 'GET'])
 @login_required
 def home():
+
+    # steam market api
+    # get top 5 csgo market items
+    getAllItems = requests.get('https://steamcommunity.com/market/search/render/?appid=730&norender=1&count=5')
+    allItems = getAllItems.content;
+    allItems = json.loads(allItems);
+    allItems = allItems['results'];
+    session['top5Items']=allItems
+
     if request.method == 'GET':
         post = posts.query.all()
         commentlist = comments.query.all()
         user = accounts.query.all()
-
-
-
         return render_template('home.html',name=session.get('name'), userlevel=session.get('userlevel'), posts=post, comments=commentlist,users=user, navMarketItems=session.get('top5Items'))
 
-    if request.method =='POST':
+    if request.method == 'POST':
         if 'block' in request.form:
             blockpostID=request.form['postID']
-            #print("blocking post"+ blockpostID)
             blockpost = posts.query.filter_by(postID=blockpostID).first()
             blockpost.blocked = 'true'
             db.session.commit()
@@ -241,7 +252,8 @@ def home():
 def profile(name):
 
     usersteamidRESULT = db.session.query(accounts.steamid).filter_by(username=name).first()
-    if str(usersteamidRESULT[0]) != "None":
+    result=str(usersteamidRESULT[0])
+    if result != "None":
         usersteamid=usersteamidRESULT[0]
         #refreshBackpack = requests.get("https://backpack.tf/api/inventory/76561198049424934/status")
         refreshBackpack = requests.get("https://backpack.tf/api/inventory/"+usersteamid+"/status")
@@ -256,7 +268,6 @@ def profile(name):
         getTotalBackpackValue = getTotalBackpackValue['730']
         getTotalBackpackValue = getTotalBackpackValue['value']
         totalBackpackValue = getTotalBackpackValue
-
 
         getInvItems = requests.get('https://steamcommunity.com/inventory/'+usersteamid+'/730/2?l=english&count=5000')
         invItems = getInvItems.content;
@@ -418,6 +429,10 @@ def addaccount():
     if request.method == 'GET':
         return render_template("addaccount.html", title="Add Account", name=session.get('name'),userlevel=session.get('userlevel'),navMarketItems=session.get('top5Items'))
 
+
+
+
+
 @app.route('/search', methods=['POST', 'GET'])
 @login_required
 def search():
@@ -436,7 +451,7 @@ def search():
         resulted_comments = comments.query.all()
         allusers = accounts.query.all()
         #print(resulted_comments)
-    return render_template("search.html", posts=resulted_post, users=resulted_users, everyuser=allusers, search_txt=src, comments=resulted_comments,name=session.get('name'), userlevel=session.get('userlevel'), navMarketItems=session.get('top5Items'))
+    return render_template("search.html", posts=resulted_post, users=resulted_users, everyuser=allusers, search_txt=src, comments=resulted_comments,name=session.get('name'), userlevel=session.get('userlevel'),navMarketItems=session.get('top5Items'))
 
 @app.route('/TopMarketItems', methods=['POST', 'GET'])
 @login_required
@@ -454,7 +469,7 @@ def topMarketItems():
 @login_required
 def searchMarketItems():
     if request.method =='GET':
-        return render_template("searchMarketItems.html", name=session.get('name'), userlevel=session.get('userlevel'),navMarketItems=session.get('top5Items'))
+        return render_template("searchMarketItems.html", name=session.get('name'), userlevel=session.get('userlevel'))
     if request.method =='POST':
         searchTerm = request.form['search']
         getAllItems = requests.get('https://steamcommunity.com/market/search/render/?query='+searchTerm+'&category_730_ItemSet%5B%5D=any&category_730_ProPlayer%5B%5D=any&category_730_StickerCapsule%5B%5D=any&category_730_TournamentTeam%5B%5D=any&category_730_Weapon%5B%5D=any&appid=730&norender=1')
@@ -466,7 +481,7 @@ def searchMarketItems():
             print("empty")
             empty='empty'
             return render_template("searchMarketItems.html", empty=empty, searchedTerm=searchTerm, items=allItems,
-                                   name=session.get('name'), userlevel=session.get('userlevel'),navMarketItems=session.get('top5Items'))
+                                   name=session.get('name'), userlevel=session.get('userlevel'))
 
 
     return  render_template("searchMarketItems.html",searchedTerm=searchTerm, items=allItems, name=session.get('name'), userlevel=session.get('userlevel'),navMarketItems=session.get('top5Items'))
@@ -495,7 +510,6 @@ def handle_sendMessage_event(data):
     #print(data)
 
 if __name__ == '__main__':
-    socketio.run(app)
 
-    # socketio.run(app) #if local
-    # app.run() #if going to deploy to heroku
+    #socketio.run(app) #if local
+    app.run() #if going to deploy to heroku
