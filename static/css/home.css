@@ -71,6 +71,8 @@ a:active {
     margin: auto;
     overflow: auto;
     background: linear-gradient(#2a475e, #395f7f);
+    text-align: left;
+    text-indent: 20px;
 }
 
 .sendcomment{
@@ -105,4 +107,17 @@ input[type="text"]
 
 #commentSend:hover{
     background-image: linear-gradient(#1b2838, #2a475e);
+}
+
+#postprofileimg{
+    border: 1px solid black;
+    border-radius: 50%;
+    margin-right: 10px;
+    margin-bottom: -10px;
+}
+
+#commentprofileimg {
+    border: 1px solid black;
+    border-radius: 50%;
+    margin-bottom: -5px;
 }

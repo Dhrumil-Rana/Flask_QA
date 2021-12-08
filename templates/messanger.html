@@ -48,15 +48,15 @@
     <div id="messagelist" class="messagelist">
     {% for msg in msgsALL %}
         {% if msg[2] == sendersID %}
-            <div class="usermsg"><h2> You : {{ msg[1] }}</h2></div>
+            <div class="usermsg"><h2 contenteditable="true">{{ msg[1] }}</h2></div>
         {% else %}
-            <div class="friendmsg"><h2>{{ friend }} : {{ msg[1] }}</h2></div>
+            <div class="friendmsg"><h2 contenteditable="true">{{ msg[1] }}</h2></div>
         {% endif %}
     {% endfor %}
     </div><br>
 
 
-    <form id="sendmessage" >
+    <form id="sendmessage">
         <input type="text" id="message_input" placeholder="Message {{ friend }}">
         <button type="submit">Send</button>
     </form>

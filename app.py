@@ -14,7 +14,7 @@ app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 ENV = 'prod'
-select_database = 'dhrumil'
+select_database = 'almin'
 
 #this is for localhost
 if ENV == 'dev':
@@ -224,7 +224,20 @@ def home():
         post = posts.query.all()
         commentlist = comments.query.all()
         user = accounts.query.all()
-        return render_template('home.html',name=session.get('name'), userlevel=session.get('userlevel'), posts=post, comments=commentlist,users=user, navMarketItems=session.get('top5Items'))
+
+        usersteamidRESULT = db.session.query(accounts.steamid).filter_by(username=session.get('name')).first()
+        result = str(usersteamidRESULT[0])
+        if result != "None":
+            usersteamid = usersteamidRESULT[0]
+            # refreshBackpack = requests.get("https://backpack.tf/api/inventory/76561198049424934/status")
+            refreshBackpack = requests.get("https://backpack.tf/api/inventory/" + usersteamid + "/status")
+            getUserInfo = requests.get(
+                "https://backpack.tf/api/users/info/v1?steamids=" + usersteamid + "&key=6183f13deea7b76faf43ee48")
+            getUserInfo = getUserInfo.content;
+            getUserInfo = json.loads(getUserInfo)
+            getUserInfo = getUserInfo['users']
+            getUserInfo = getUserInfo[usersteamid]
+            return render_template('home.html',name=session.get('name'), userlevel=session.get('userlevel'), posts=post, comments=commentlist,users=user, navMarketItems=session.get('top5Items'), userSteamInfo=getUserInfo, profilepagename=session.get('name'))
 
     if request.method == 'POST':
         if 'block' in request.form:
@@ -511,5 +524,5 @@ def handle_sendMessage_event(data):
 
 if __name__ == '__main__':
 
-    #socketio.run(app) #if local
-    app.run() #if going to deploy to heroku
+    socketio.run(app, debug=True) #if local
+    #app.run() #if going to deploy to heroku
