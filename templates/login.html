@@ -16,6 +16,7 @@
                 <label for="password">Password</label><br>
                 <input type="password" placeholder="Enter password" id="password" name='password'><br><br><br>
                 <input type="submit" value="Login">
+                <p><a style="color:white" href="{{url_for('register')}}"> Register?</a></p>
             </div><br>
         </form>
         {% if info is defined and info|length %}

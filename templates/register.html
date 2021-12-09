@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>{{ title }}</title>
+        <link rel="stylesheet" type = "text/css" href="{{ url_for('static' , filename='css/login.css') }}">
+    </head>
+    <body>
+    {{ Message }}
+    <h1 class="post">Register</h1>
+    <form id="signin" method="POST" title="Register">
+            <div class="submission">
+                <label>Create a new account</label><br><br>
+                <label for="username">Username</label><br>
+                <input type="text" required placeholder="Enter username" id="username" name='username'><br><br>
+                <label for="password">Password</label><br>
+                <input type="password" required placeholder="Enter password" id="password" name='password'><br><br>
+                <label for="steamid">Steam ID</label><br>
+                <input type="steamid" required placeholder="Enter Steam ID" id="steamid" name='steamid'><br>
+                <p style="color:white;">Steam profile and inventory must be public</p>
+                <input type="submit" value="Register">
+                <p><a style="color:white" href="{{url_for('login')}}">Back to log in</a></p>
+            </div><br>
+        </form>
+    {% if info is defined and info|length %}
+            <div class="alert">
+                <h2>{{info}}</h2>
+            </div>
+    {% endif %}
+    </body>
+</html>

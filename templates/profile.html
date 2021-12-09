@@ -7,7 +7,9 @@
 {% block content %}
     <h1 style="color:white";>
             <img id="profileimg" src="{{ userSteamInfo.avatar }}" height="100px"/> {{profilepagename}}<br>
+        {% if userSteamInfo.name =="" %}
         <center><h3>Known as {{ userSteamInfo.name }} on Steam</h3></center>
+        {% endif %}
     </h1>
     {% if profilepagename!=name %}
         {% if isFriend=="False" %}
@@ -21,9 +23,16 @@
             <center><h3>You are friends with {{profilepagename}}</h3></center>
         {% endif %}
     {% endif %}
+    {% if backpackValue=="backpack.tf is down" %}
+        <h1 style="color:white";>
+            Backpack.tf API is currently down or unreachable<br><br>
+            Total Inventory Value is currently unavailable with {{ invCount }} items<br><br>
+    </h1>
+    {% else %}
     <h1 style="color:white";>
             Total Inventory Value is ${{ backpackValue }} with {{ invCount }} items<br><br>
     </h1>
+    {% endif %}
     <section class="accordion">
     <input type="checkbox" name="collapse" id="handle1">
     <h2 class="handle">

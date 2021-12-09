@@ -10,10 +10,12 @@ h1{
 }
 a:link {
   color: #66c0f4;
+    text-decoration: none
 }
 
 a:visited {
-  color: #66c0f4;
+  color: white;
+    text-decoration: none
 }
 
 a:hover {
@@ -21,7 +23,7 @@ a:hover {
 }
 
 a:active {
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 .friendslist{

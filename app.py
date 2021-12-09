@@ -142,6 +142,28 @@ def logout():
     session.pop('userlevel', None)
     return redirect(url_for('login'))
 
+@app.route('/register',methods=['POST', 'GET'])
+def register():
+
+    if request.method == 'GET':
+        return render_template("register.html", title="Register Page")
+
+    if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'steamid' in request.form:
+        allusers = db.session.query(accounts.username).all()
+        newuserName = request.form['username']
+        for usernames in allusers:
+            if newuserName == usernames[0]:
+                return render_template('register.html', info='Username already exists')
+        passIN = request.form['password']
+        newsteamID = request.form['steamid']
+        newpassword = bcrypt.hashpw(passIN.encode('utf-8'), bcrypt.gensalt())
+        user = accounts(username=newuserName, password=newpassword.decode('utf-8'), role='U', steamid=newsteamID)
+        db.session.add(user)
+        db.session.commit()
+        return render_template("login.html", title="Login Page")
+    else:
+        return redirect(url_for('register'))
+
 
 @app.route('/login',methods=['POST', 'GET'])
 def login():
@@ -205,6 +227,17 @@ def blockedPosts():
 @app.route('/home', methods=['POST', 'GET'])
 @login_required
 def home():
+    avatarDictionary = {}
+    allUsers = accounts.query.all()
+    for u in allUsers:
+        getUserInfo = requests.get("https://backpack.tf/api/users/info/v1?steamids=" + u.steamid + "&key=6183f13deea7b76faf43ee48")
+        getUserInfo = getUserInfo.content;
+        getUserInfo = json.loads(getUserInfo)
+        getUserInfo = getUserInfo['users']
+        getUserInfo = getUserInfo[u.steamid]
+        getUserInfo = getUserInfo['avatar']
+        avatarDictionary[u.userID]=getUserInfo
+
     if request.method == 'GET':
         post = posts.query.all()
         commentlist = comments.query.all()
@@ -212,7 +245,7 @@ def home():
 
 
 
-        return render_template('home.html',name=session.get('name'), userlevel=session.get('userlevel'), posts=post, comments=commentlist,users=user, navMarketItems=session.get('top5Items'))
+        return render_template('home.html',name=session.get('name'), userlevel=session.get('userlevel'), posts=post, comments=commentlist,users=user, navMarketItems=session.get('top5Items'),myDict = avatarDictionary)
 
     if request.method =='POST':
         if 'block' in request.form:
@@ -234,7 +267,6 @@ def home():
             db.session.add(commentSEND)
             db.session.commit()
         return redirect('home')
-# return a list of post and gian has to make a css file such that it will show in sequence
 
 @app.route('/profile/<name>', methods=['POST', 'GET'])
 @login_required
@@ -245,16 +277,25 @@ def profile(name):
     #refreshBackpack = requests.get("https://backpack.tf/api/inventory/76561198049424934/status")
     refreshBackpack = requests.get("https://backpack.tf/api/inventory/"+usersteamid+"/status")
     getUserInfo = requests.get("https://backpack.tf/api/users/info/v1?steamids="+usersteamid+"&key=6183f13deea7b76faf43ee48")
-    getUserInfo = getUserInfo.content;
-    getUserInfo = json.loads(getUserInfo)
-    getUserInfo = getUserInfo['users']
-    getUserInfo = getUserInfo[usersteamid]
+    if getUserInfo != None:
+        try:
+            getUserInfo = getUserInfo.content;
+            getUserInfo = json.loads(getUserInfo)
+            getUserInfo = getUserInfo['users']
+            getUserInfo = getUserInfo[usersteamid]
 
-    #get backpack total value
-    getTotalBackpackValue = getUserInfo['inventory']
-    getTotalBackpackValue = getTotalBackpackValue['730']
-    getTotalBackpackValue = getTotalBackpackValue['value']
-    totalBackpackValue = getTotalBackpackValue
+            #get backpack total value
+            getTotalBackpackValue = getUserInfo['inventory']
+            getTotalBackpackValue = getTotalBackpackValue['730']
+            getTotalBackpackValue = getTotalBackpackValue['value']
+            totalBackpackValue = getTotalBackpackValue
+        except ValueError: #includes JSONDecodeError
+            totalBackpackValue = 'backpack.tf is down'
+            getUserInfo = 'backpack.tf API is down'
+
+    else:
+        totalBackpackValue = 'backpack.tf is down'
+        getUserInfo = 'backpack.tf is down'
 
 
     getInvItems = requests.get('https://steamcommunity.com/inventory/'+usersteamid+'/730/2?l=english&count=5000')
@@ -383,8 +424,15 @@ def Post():
 @app.route('/AddAccount', methods=['POST', 'GET'])
 @login_required
 def addaccount():
+    allusers = db.session.query(accounts.username).all()
+    print(allusers)
     if request.method == 'POST':
+        allusers = db.session.query(accounts.username).all()
         newuserName = request.form['username']
+
+        for usernames in allusers:
+            if newuserName == usernames[0]:
+                return render_template('addaccount.html', info='Username already exists',name=session.get('name'),userlevel=session.get('userlevel'),navMarketItems=session.get('top5Items'))
         passIN = request.form['password']
         newsteamID = request.form['steamid']
         newrole = request.form['role']
