@@ -12,9 +12,11 @@ h1{
 }
 
 .messagelist{
+    display: flex;
+    flex-direction: column-reverse;
     margin: auto;
-    width: 75%;
-    height: 500px;
+    width: 100%;
+    height: 650px;
     word-break: break-word;
     overflow: auto;
     background: linear-gradient(#2a475e, #1b2838);
@@ -34,7 +36,7 @@ h1{
     color: #000;
     text-align: center;
     vertical-align: bottom;
-    margin-left: 175px;
+    margin-left: 410px;
     margin-top: 10px;
     margin-bottom: 32px;
 }

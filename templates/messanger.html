@@ -21,8 +21,8 @@
                 e.preventDefault();
                 let message = message_input.value.trim();
                 if (message.length) {
-                    var newMSG = '<div class="usermsg"><h2> You : ' + message + ' </h2></div>';
-                    document.getElementById('messagelist').insertAdjacentHTML('beforeend',newMSG);
+                    var newMSG = '<div class="usermsg"><h2> ' + message + ' </h2></div>';
+                    document.getElementById('messagelist').insertAdjacentHTML('afterbegin',newMSG);
 
                     socket.emit('sendMessage', {
                         user:"{{ name }}",
@@ -37,24 +37,28 @@
             }
         });
         socket.on('receiveMessage', function(data) {
-            var newMSG = '<div class="friendmsg"><h2>'+data.user+' : ' + data.message + ' </h2></div>';
-            document.getElementById('messagelist').insertAdjacentHTML('beforeend',newMSG);
+            var newMSG = '<div class="friendmsg"><h2>' + data.message + ' </h2></div>';
+            document.getElementById('messagelist').insertAdjacentHTML('afterbegin',newMSG);
         });
-
+        var msglist = document.getElementById("messagelist");
+        element.scrollTop = element.scrollHeight;
     </script>
 
      <h1 class="post">Chat with: {{ friend }}</h1>
 
     <div id="messagelist" class="messagelist">
-    {% for msg in msgsALL %}
+    {% for msg in msgsALL|reverse %}
         {% if msg[2] == sendersID %}
-            <div class="usermsg"><h2 contenteditable="true">{{ msg[1] }}</h2></div>
+            <div class="usermsg"><h2>{{ msg[1] }}</h2></div>
         {% else %}
-            <div class="friendmsg"><h2 contenteditable="true">{{ msg[1] }}</h2></div>
+            <div class="friendmsg"><h2>{{ msg[1] }}</h2></div>
         {% endif %}
     {% endfor %}
     </div><br>
-
+    <script>
+        var msglist = document.getElementById("messagelist");
+        element.scrollTop = element.scrollHeight;
+    </script>
 
     <form id="sendmessage">
         <input type="text" id="message_input" placeholder="Message {{ friend }}">
