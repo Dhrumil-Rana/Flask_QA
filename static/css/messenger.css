@@ -16,7 +16,7 @@ h1{
     flex-direction: column-reverse;
     margin: auto;
     width: 100%;
-    height: 650px;
+    height: 625px;
     word-break: break-word;
     overflow: auto;
     background: linear-gradient(#2a475e, #1b2838);
@@ -78,4 +78,24 @@ h1{
     border-bottom: 20px solid transparent;
     left: 32px;
     bottom: -24px;
+}
+
+#message_input{
+    width: 90%;
+    padding: 12px 20px;
+    box-sizing: border-box;
+    border-radius: 40px;
+    border: none;
+}
+
+#message_button{
+    background-color: #487aa1;
+    border: none;
+    border-radius: 5px;
+    padding: 12px 20px;
+    cursor: pointer;
+}
+
+#message_button:hover{
+    background-color: #365c7a;
 }
