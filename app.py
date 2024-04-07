@@ -18,14 +18,14 @@ import time
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-ENV = 'prod'
-select_database = 'almin'
+ENV = 'dev'
+select_database = 'dhrumil'
 
 #this is for localhost
 if ENV == 'dev':
     app.debug = True
     if select_database == 'dhrumil':
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Dhrumil1998@@@localhost/gameApp'
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://u4h1cea4c9980i:p997574b11e47e8fd0a97729722f47a83071744a7007bcd658373e880ae43266c@cb4l59cdg4fg1k.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/dnc99nerpmtjr'
     else:
         app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:almin123@localhost/flaskwebsite490'
 # this one is for the heruko
