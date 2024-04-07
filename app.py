@@ -2,24 +2,33 @@ from flask import Flask,request,render_template,session,redirect,url_for,flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO, send, emit, ConnectionRefusedError, join_room
 from functools import wraps
+from functools import wraps
 import pickle
 import bcrypt
 import urllib.request
 import base64
+import base64
 from werkzeug.utils import secure_filename
 import os
+import requests
+import json
+from datetime import datetime
+import time
+
+
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*")
 
-ENV = 'prod'
-select_database = 'almin'
+ENV = 'dev'
+select_database = 'dhrumil'
 
 #this is for localhost
 if ENV == 'dev':
     app.debug = True
     if select_database == 'dhrumil':
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Dhrumil1998@@@localhost/gameApp'
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://u4h1cea4c9980i:p997574b11e47e8fd0a97729722f47a83071744a7007bcd658373e880ae43266c@cb4l59cdg4fg1k.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/dnc99nerpmtjr'
     else:
         app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:almin123@localhost/flaskwebsite490'
 # this one is for the heruko
@@ -41,6 +50,8 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 
+
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -50,11 +61,13 @@ class accounts(db.Model):
     username = db.Column(db.VARCHAR(), unique=True)
     password = db.Column(db.VARCHAR(), unique=False)
     role = db.Column(db.CHAR(1))
+    steamid = db.Column(db.VARCHAR(), unique=True)
 
-    def __init__(self, username, password, role):
+    def __init__(self, username, password, role, steamid):
         self.username = username
         self.password = password
         self.role = role
+        self.steamid = steamid
 
 
 class posts(db.Model):
@@ -120,6 +133,16 @@ def login_required(f):
             return redirect(url_for('login'))
     return wrap
 
+def login_required(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'logged_in' in session:
+            return f(*args, **kwargs)
+        else:
+            flash('You need to login first')
+            return redirect(url_for('login'))
+    return wrap
+
 @app.route('/')
 def entry():
     return render_template("login.html")
@@ -132,9 +155,34 @@ def logout():
     session.pop('userlevel', None)
     return redirect(url_for('login'))
 
+@app.route('/register',methods=['POST', 'GET'])
+def register():
+
+    if request.method == 'GET':
+        return render_template("register.html", title="Register Page")
+
+    if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'steamid' in request.form:
+        allusers = db.session.query(accounts.username).all()
+        newuserName = request.form['username']
+        for usernames in allusers:
+            if newuserName == usernames[0]:
+                return render_template('register.html', info='Username already exists')
+        passIN = request.form['password']
+        newsteamID = request.form['steamid']
+        newpassword = bcrypt.hashpw(passIN.encode('utf-8'), bcrypt.gensalt())
+        user = accounts(username=newuserName, password=newpassword.decode('utf-8'), role='U', steamid=newsteamID)
+        db.session.add(user)
+        db.session.commit()
+        return render_template("login.html", title="Login Page")
+    else:
+        return redirect(url_for('register'))
+
 
 @app.route('/login',methods=['POST', 'GET'])
 def login():
+    if request.method=='POST':
+        nameIN = request.form['username']
+        passwordIN = request.form['password'].encode('utf-8')
     if request.method=='POST':
         nameIN = request.form['username']
         passwordIN = request.form['password'].encode('utf-8')
@@ -144,6 +192,15 @@ def login():
         if user:
             # compare password given to database hash
             if bcrypt.checkpw(passwordIN, user.password.encode('utf-8')):
+                # steam market api
+                # get top 5 csgo market items and set for session
+                getAllItems = requests.get(
+                    'https://steamcommunity.com/market/search/render/?appid=730&norender=1&count=5')
+                allItems = getAllItems.content;
+                allItems = json.loads(allItems);
+                allItems = allItems['results'];
+                session['top5Items'] = allItems
+                print(session.get('top5Items'))
                 if user.role == 'U':
                     session['logged_in']=True
                     session['name']=request.form['username']
@@ -169,7 +226,7 @@ def blockedPosts():
         commentlist = comments.query.all()
         user = accounts.query.all()
         return render_template('blockedposts.html', name=session.get('name'), userlevel=session.get('userlevel'), posts=post,
-                               comments=commentlist, users=user)
+                               comments=commentlist, users=user,navMarketItems=session.get('top5Items'))
     if request.method =='POST':
         if 'unblock' in request.form:
             blockpostID=request.form['postID']
@@ -185,13 +242,28 @@ def blockedPosts():
 
 @app.route('/home', methods=['POST', 'GET'])
 @login_required
+@login_required
 def home():
+    avatarDictionary = {}
+    allUsers = accounts.query.all()
+    for u in allUsers:
+        getUserInfo = requests.get("https://backpack.tf/api/users/info/v1?steamids=" + u.steamid + "&key=6183f13deea7b76faf43ee48")
+        getUserInfo = getUserInfo.content;
+        getUserInfo = json.loads(getUserInfo)
+        getUserInfo = getUserInfo['users']
+        getUserInfo = getUserInfo[u.steamid]
+        getUserInfo = getUserInfo['avatar']
+        avatarDictionary[u.userID]=getUserInfo
+
     if request.method == 'GET':
         post = posts.query.all()
         commentlist = comments.query.all()
         user = accounts.query.all()
 
-        return render_template('home.html',name=session.get('name'), userlevel=session.get('userlevel'), posts=post, comments=commentlist,users=user)
+
+
+        return render_template('home.html',name=session.get('name'), userlevel=session.get('userlevel'), posts=post, comments=commentlist,users=user, navMarketItems=session.get('top5Items'),myDict = avatarDictionary)
+
     if request.method =='POST':
         if 'block' in request.form:
             blockpostID=request.form['postID']
@@ -212,10 +284,92 @@ def home():
             db.session.add(commentSEND)
             db.session.commit()
         return redirect('home')
-# return a list of post and gian has to make a css file such that it will show in sequence
 
+@app.route('/profile/<name>', methods=['POST', 'GET'])
+@login_required
+def profile(name):
+
+    usersteamidRESULT = db.session.query(accounts.steamid).filter_by(username=name).first()
+    usersteamid=usersteamidRESULT[0]
+    #refreshBackpack = requests.get("https://backpack.tf/api/inventory/76561198049424934/status")
+    refreshBackpack = requests.get("https://backpack.tf/api/inventory/"+usersteamid+"/status")
+    getUserInfo = requests.get("https://backpack.tf/api/users/info/v1?steamids="+usersteamid+"&key=6183f13deea7b76faf43ee48")
+    if getUserInfo != None:
+        try:
+            getUserInfo = getUserInfo.content;
+            getUserInfo = json.loads(getUserInfo)
+            getUserInfo = getUserInfo['users']
+            getUserInfo = getUserInfo[usersteamid]
+
+            #get backpack total value
+            getTotalBackpackValue = getUserInfo['inventory']
+            getTotalBackpackValue = getTotalBackpackValue['730']
+            getTotalBackpackValue = getTotalBackpackValue['value']
+            totalBackpackValue = getTotalBackpackValue
+        except ValueError: #includes JSONDecodeError
+            totalBackpackValue = 'backpack.tf is down'
+            getUserInfo = 'backpack.tf API is down'
+
+    else:
+        totalBackpackValue = 'backpack.tf is down'
+        getUserInfo = 'backpack.tf is down'
+
+
+    getInvItems = requests.get('https://steamcommunity.com/inventory/'+usersteamid+'/730/2?l=english&count=5000')
+    invItems = getInvItems.content;
+    invItems = json.loads(invItems);
+    invCount = invItems['total_inventory_count'];
+    invItems = invItems['descriptions'];
+
+    profileid = db.session.query(accounts.userID).filter_by(username=name).first()
+    currentuserid = db.session.query(accounts.userID).filter_by(username=session.get('name')).first()
+    friendExist = db.session.query(friends).filter_by(friendID=profileid,userID=currentuserid).first()
+    if friendExist is not None:
+        isFriend="True"
+    else:
+        isFriend="False"
+
+    if request.method == 'GET':
+        userid=db.session.query(accounts.userID).filter_by(username=name).first()
+        post = db.session.query(posts).filter_by(uID=userid).all()
+        commentlist = comments.query.all()
+        user = accounts.query.all()
+        return render_template('profile.html',isFriend=isFriend, userSteamInfo=getUserInfo, backpackValue=totalBackpackValue,invItems=invItems,invCount=invCount,profilepagename=name,name=session.get('name'), userlevel=session.get('userlevel'), posts=post, comments=commentlist,users=user, navMarketItems=session.get('top5Items'))
+
+    if request.method =='POST':
+        if 'addfriend' in request.form:
+            requestername=session.get('name')
+            requesterID = db.session.query(accounts.userID).filter_by(username=requestername).first()
+            addfriendname=name
+            friendID = db.session.query(accounts.userID).filter_by(username=addfriendname).first()
+            friend = friends(friendID=requesterID,userID=friendID)
+            db.session.add(friend)
+            friend2 = friends(friendID=friendID, userID=requesterID)
+            db.session.add(friend2)
+            db.session.commit()
+
+        if 'block' in request.form:
+            blockpostID=request.form['postID']
+            #print("blocking post"+ blockpostID)
+            blockpost = posts.query.filter_by(postID=blockpostID).first()
+            blockpost.blocked = 'true'
+            db.session.commit()
+
+        post = posts.query.all()
+        commentlist = comments.query.all()
+        user = accounts.query.all()
+
+        if 'comment' in request.form:
+            userID = db.session.query(accounts.userID).filter_by(username=session.get('name')).first()
+            commenttext=request.form['comment_input']
+            postID=request.form['postID']
+            commentSEND = comments(textComment=commenttext, commenterID=userID, postID=postID)
+            db.session.add(commentSEND)
+            db.session.commit()
+        return redirect(name)
 
 @app.route('/Friends', methods=['POST', 'GET'])
+@login_required
 @login_required
 def friend():
     #getting userid then getting friends and filling friendlist
@@ -227,7 +381,7 @@ def friend():
         friendlist.append(f)
     # getting userid then getting friends and filling friendlist
     #print(friendlist)
-    return render_template("friends.html",friends=friendlist, title="Friends", name=session.get('name'), userlevel=session.get('userlevel') )
+    return render_template("friends.html",friends=friendlist, title="Friends", name=session.get('name'), userlevel=session.get('userlevel'),navMarketItems=session.get('top5Items') )
 #return a list of all the friends
 
 
@@ -242,15 +396,19 @@ def messanger(name, friendname):
     allmsgs = sentmsgs + receivedmsgs
     allmsgs.sort()
     #print(allmsgs)
+    #print(allmsgs)
 
     if request.method == 'GET':
-        return render_template("messanger.html", title="Messanger", msgsALL=allmsgs, msgsSent=sentmsgs, msgsReceived=receivedmsgs, sendersID=usersID[0], friend=friendname, friendID=friendsID[0], name=session.get('name'), userlevel=session.get('userlevel'))
-
-
+        return render_template("messanger.html", title="Messanger", msgsALL=allmsgs, msgsSent=sentmsgs, msgsReceived=receivedmsgs, sendersID=usersID[0], friend=friendname, friendID=friendsID[0], name=session.get('name'), userlevel=session.get('userlevel'),navMarketItems=session.get('top5Items'))
 
 @app.route('/CreatePost', methods=['POST', 'GET'])
 @login_required
+@login_required
 def Post():
+    def render_picture(data):
+        render_pic = base64.b64encode(data).decode('ascii')
+        return render_pic
+
     def render_picture(data):
         render_pic = base64.b64encode(data).decode('ascii')
         return render_pic
@@ -262,8 +420,14 @@ def Post():
         if 'usertext' not in request.form:
             flash('Post requires text')
             return redirect(request.url)
+        account = accounts.query.filter_by(username=session.get('name')).first()
+        userid = account.userID
+        blocked = "false"
+        if 'usertext' not in request.form:
+            flash('Post requires text')
+            return redirect(request.url)
         usertext = request.form['usertext']
-        if 'img' in request.form:
+        if 'img' in request.files:
             image = request.files['img']
             if allowed_file(image.filename):
                 filename = secure_filename(image.filename)
@@ -278,30 +442,41 @@ def Post():
                 return redirect(request.url)
         else:
             post = posts(uID=userid,image=None, filename=None,mimetype=None, description=usertext, blocked=blocked)
+            post = posts(uID=userid,image=None, filename=None,mimetype=None, description=usertext, blocked=blocked)
         db.session.add(post)
         db.session.commit()
         return redirect(url_for('home'))
+        return redirect(url_for('home'))
     if request.method == 'GET':
         return render_template("createpost.html", title="Create Post", name=session.get('name'),
-                               userlevel=session.get('userlevel'))
+                               userlevel=session.get('userlevel'),navMarketItems=session.get('top5Items'))
 
 
 # gian will add the post through a form post and we will take it and add it to our database
 @app.route('/AddAccount', methods=['POST', 'GET'])
 @login_required
+@login_required
 def addaccount():
+    allusers = db.session.query(accounts.username).all()
+    print(allusers)
     if request.method == 'POST':
+        allusers = db.session.query(accounts.username).all()
         newuserName = request.form['username']
+
+        for usernames in allusers:
+            if newuserName == usernames[0]:
+                return render_template('addaccount.html', info='Username already exists',name=session.get('name'),userlevel=session.get('userlevel'),navMarketItems=session.get('top5Items'))
         passIN = request.form['password']
+        newsteamID = request.form['steamid']
         newrole = request.form['role']
         newpassword = bcrypt.hashpw(passIN.encode('utf-8'), bcrypt.gensalt())
-        user = accounts(username= newuserName, password=newpassword.decode('utf-8'), role=newrole)
+        user = accounts(username= newuserName, password=newpassword.decode('utf-8'), role=newrole, steamid=newsteamID)
         db.session.add(user)
         db.session.commit()
-        return render_template("addaccount.html", title="Add Account", name=session.get('name'),userlevel=session.get('userlevel'))
+        return render_template("addaccount.html", title="Add Account", name=session.get('name'),userlevel=session.get('userlevel'),navMarketItems=session.get('top5Items'))
 
     if request.method == 'GET':
-        return render_template("addaccount.html", title="Add Account", name=session.get('name'),userlevel=session.get('userlevel'))
+        return render_template("addaccount.html", title="Add Account", name=session.get('name'),userlevel=session.get('userlevel'),navMarketItems=session.get('top5Items'))
 
 @app.route('/search', methods=['POST', 'GET'])
 @login_required
@@ -321,7 +496,40 @@ def search():
         resulted_comments = comments.query.all()
         allusers = accounts.query.all()
         #print(resulted_comments)
-    return render_template("search.html", posts=resulted_post, users=resulted_users, everyuser=allusers, search_txt=src, comments=resulted_comments,name=session.get('name'), userlevel=session.get('userlevel'))
+    return render_template("search.html", posts=resulted_post, users=resulted_users, everyuser=allusers, search_txt=src, comments=resulted_comments,name=session.get('name'), userlevel=session.get('userlevel'), navMarketItems=session.get('top5Items'))
+
+@app.route('/TopMarketItems', methods=['POST', 'GET'])
+@login_required
+def topMarketItems():
+    # steam market api
+    # pull top 20 market items
+
+    getAllItems = requests.get('https://steamcommunity.com/market/search/render/?appid=730&norender=1&count=20')
+    allItems = getAllItems.content;
+    allItems = json.loads(allItems);
+    allItems = allItems['results'];
+    return render_template("topMarketItems.html" , items=allItems, name=session.get('name'), userlevel=session.get('userlevel'),navMarketItems=session.get('top5Items'))
+
+@app.route('/SearchMarketItems', methods=['POST', 'GET'])
+@login_required
+def searchMarketItems():
+    if request.method =='GET':
+        return render_template("searchMarketItems.html", name=session.get('name'), userlevel=session.get('userlevel'),navMarketItems=session.get('top5Items'))
+    if request.method =='POST':
+        searchTerm = request.form['search']
+        getAllItems = requests.get('https://steamcommunity.com/market/search/render/?query='+searchTerm+'&category_730_ItemSet%5B%5D=any&category_730_ProPlayer%5B%5D=any&category_730_StickerCapsule%5B%5D=any&category_730_TournamentTeam%5B%5D=any&category_730_Weapon%5B%5D=any&appid=730&norender=1')
+        allItems = getAllItems.content;
+        allItems = json.loads(allItems);
+        allItems = allItems['results'];
+        empty='not'
+        if allItems==[]:
+            print("empty")
+            empty='empty'
+            return render_template("searchMarketItems.html", empty=empty, searchedTerm=searchTerm, items=allItems,
+                                   name=session.get('name'), userlevel=session.get('userlevel'),navMarketItems=session.get('top5Items'))
+
+
+    return  render_template("searchMarketItems.html",searchedTerm=searchTerm, items=allItems, name=session.get('name'), userlevel=session.get('userlevel'),navMarketItems=session.get('top5Items'))
 
 #socketio events
 @socketio.on("joined")
@@ -329,7 +537,9 @@ def handle_event_joined(data):
     #new room is a room which the user joins when they select a friend to receive messages from and send to
     newRoom = data['userID'] +":" + data['friendID']  #the room is only for this user, not the friend
     #print(newRoom)
+    #print(newRoom)
     join_room(newRoom)
+    #print(data)
     #print(data)
 
 @socketio.on("sendMessage")
@@ -345,8 +555,11 @@ def handle_sendMessage_event(data):
     socketio.emit('receiveMessage',data,room=sendToRoom)
     #print("sending to: "+sendToRoom)
     #print(data)
+    #print("sending to: "+sendToRoom)
+    #print(data)
 
 if __name__ == '__main__':
     socketio.run(app)
-    # socketio.run(app) if local
-    #app.run() if going to deploy to heroku
+
+    # socketio.run(app) #if local
+    # app.run() #if going to deploy to heroku

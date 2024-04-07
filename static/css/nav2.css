@@ -1,0 +1,86 @@
+.bar2 ul{
+    list-style-type: none;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    float: right;
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 1;
+    overflow-x: hidden;
+    height: 100%;
+    width: 17%;
+    margin-top: 0;
+    background: linear-gradient(#2a475e, #1b2838);
+}
+
+.bar2 ul li{
+    width: 100%;
+    margin-right: 10%;
+}
+
+.bar2 ul li a{
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 30px;
+    font-size: 15px;
+    text-decoration: none;
+}
+
+.bar2 ul li a:hover{
+    background: linear-gradient(to bottom, #171a21, #1b2838) fixed;
+}
+
+.bar2 ul li form{
+    alignment: right;
+}
+
+
+h7{
+    font-family: Arial;
+    text-align: left;
+    min-height: 30px;
+    font-size: small;
+    word-break: normal;
+}
+
+
+
+h8{
+    margin-top: 10px;
+    alignment: center;
+    align-items: center;
+    text-align: center;
+    font-family: Arial;
+    color: white;
+    font-size: small;
+    word-break: normal;
+}
+
+img {
+  border: 1px solid white;
+    border-radius: 25px;
+}
+
+#itemimg{
+    max-height: 50px;
+    max-width: 50px;
+    border: 1px solid white;
+    float: left;
+    margin-left: 1%;
+}
+
+#searchBtn{
+    display: inline-block;
+    border: 1px solid black;
+    border-radius: 20px;
+    color: #ffffff;
+    background: linear-gradient(#2a475e, #1b2838);
+    padding: 10px 10px;
+}
+
+#searchBtn:hover{
+    background: linear-gradient(#1a2c3a, #1b2838);
+}

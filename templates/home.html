@@ -2,12 +2,15 @@
 
 {% block css %}
     <link rel="stylesheet" type = "text/css" href="{{ url_for ('static' , filename='css/home.css') }}">
+    <link rel="stylesheet" type = "text/css" href="{{ url_for ('static' , filename='css/home.css') }}">
 {% endblock %}
 
 {% block content %}
     <h1 class="result">
             Welcome, {{name}}.<br><br>
+            Welcome, {{name}}.<br><br>
     </h1>
+    <div id="postlist" class="postlist">
     <div id="postlist" class="postlist">
     {% for post in posts %}
         {% if post.blocked=='false' %}
@@ -21,14 +24,21 @@
             {% endif %}
             {% for user in users %}
                 {% if post.uID == user.userID %}
-                    <center><h2><p style="color:black";>{{user.username}}'s post</p></h2></center>
+                    <center><h2><a href="/profile/{{ user.username }}">
+                        {% for key, value in myDict.items() %}
+                            {% if key == user.userID %}
+                                <img id="postprofileimg" src="{{ value }}" height="60px"/>
+                                {% else %}
+                            {% endif %}
+                        {% endfor %}
+                    {{ user.username }}</a></h2></center>
                 {% endif %}
             {% endfor %}
             <div id="postcontent" class="postcontent">
+            <center><h3><p style="color:white";>{{post.description}}</p></h3></center>
             {% if post.image != None %}
-	            <center><img src="data:{{post.mimetype}};base64,{{post.image}}" width="300"/></center>
+	            <center><img src="data:{{post.mimetype}};base64,{{post.image}}" width="600"/></center>
             {% endif %}
-            <center><h3><p style="color:black";>{{post.description}}</p></h3></center>
             </div><br>
 
             <center><div id="commentlist"  class="commentlist">
@@ -36,7 +46,13 @@
                 {% if comment.postID == post.postID %}
                     {% for user in users %}
                         {% if comment.commenterID==user.userID %}
-                            <div class="comments"><h4><p>{{ user.username }}: {{ comment.textComment }}</p></h4></div>
+                            <div class="comments"><h4><p>
+                                {% for key, value in myDict.items() %}
+                                    {% if key == user.userID %}
+                                        <img id="commentprofileimg" src="{{ value }}" height="25px"/>
+                                    {% endif %}
+                                {% endfor %}
+                                <a href="/profile/{{ user.username }}">{{ user.username }}</a>: {{ comment.textComment }}</p></h4></div>
                         {% endif %}
                     {% endfor %}
                 {% endif %}
@@ -55,6 +71,7 @@
          </div>
          {% endif %}
     {% endfor %}
+    </div>
     </div>
 
 {% endblock %}

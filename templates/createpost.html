@@ -6,19 +6,21 @@
 {% endblock %}
 
 {% block content %}
-    <h1 class="post">Create Post</h1>
+    <h1 class="post">Create a new post</h1>
 
     <form id="userpost" enctype="multipart/form-data" method="post" title="Post">
         <div class="postfield">
             <textarea rows="4" cols="80" name="usertext" wrap="hard" placeholder="Enter your thoughts here." form="userpost"></textarea><br>
             <label for="img">Attach image:</label>
             <input type="file" id="img" name="img" accept=".png, .jpg, .jpeg .gif"><br>
+            <input type="file" id="img" name="img" accept=".png, .jpg, .jpeg .gif"><br>
             {% if filename %}
             <div>
             <center><img src="data:{{post.mimetype}};base64,{{post.image}}" width="300"/></center>
+            <center><img src="data:{{post.mimetype}};base64,{{post.image}}" width="300"/></center>
             </div>
             {% endif %}
-            <input type="submit" value="Post" onclick = "alert('Thanks for Post {{name}}')">
+            <input type="submit" value="Post" onclick = "alert('Your post has been sent, {{name}}')">
         </div><br>
     </form>
 {% endblock %}

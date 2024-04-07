@@ -8,7 +8,7 @@
     <h1>Friends:</h1>
     <div class="friendslist">
     {% for fr in friends %}
-        <h1><a href="/messanger/{{ name }}/{{ fr[0] }}">{{ fr[0] }}</a></h1>
+        <h1><a href="/profile/{{ fr[0] }}">{{ fr[0] }}</a>   | <a href="/messanger/{{ name }}/{{ fr[0] }}">Message {{ fr[0] }}</a></h1>
     {% endfor %}
     </div>
 {% endblock %}

@@ -1,45 +1,59 @@
 .bar ul{
     list-style-type: none;
-    margin: 0;
-    width: 100%;
-    padding: 0;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    float: left;
     position: fixed;
     top: 0;
     left: 0;
-    overflow: hidden;
-    background-image: linear-gradient(180deg, #f83cd7, #e868b3);
+    z-index: 1;
+    overflow-x: hidden;
+    height: 100%;
+    margin-top: 0;
+    margin-left: -3rem;
+    background: linear-gradient(#2a475e, #1b2838);
 }
 
 .bar ul li{
-    float: left;
+    width: 100%;
 }
 
 .bar ul li a{
     display: block;
-    color: #000000;
+    color: white;
     text-align: center;
-    padding: 14px 16px;
+    padding: 14px;
+    font-size: 20px;
+    font-weight: 800;
     text-decoration: none;
-    border-left: 1px solid #000000;
 }
+
+
+.bar ul li a span{
+   padding: 9px;
+}
+
+
+
 
 .bar ul li a:hover{
-    background-image: linear-gradient(180deg, #c209a4, #c209a4);
+    background: linear-gradient(to bottom, #171a21, #1b2838) fixed;
 }
 
+.bar ul li form{
+    alignment: right;
+    margin-left: 12px;
+}
 #searchBtn{
     display: inline-block;
-    border: 1px solid rebeccapurple;
+    border: 1px solid black;
     border-radius: 20px;
     color: #ffffff;
-    background-image: linear-gradient(45deg, rebeccapurple, mediumpurple);
+    background: linear-gradient(#2a475e, #1b2838);
     padding: 10px 10px;
 }
 
 #searchBtn:hover{
-    background-image: linear-gradient(45deg, #4f2678, #6e53a6);
-}
-
-body{
-    padding-top: 50px;
+    background: linear-gradient(#1a2c3a, #1b2838);
 }
