@@ -2,9 +2,11 @@ from flask import Flask,request,render_template,session,redirect,url_for,flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO, send, emit, ConnectionRefusedError, join_room
 from functools import wraps
+from functools import wraps
 import pickle
 import bcrypt
 import urllib.request
+import base64
 import base64
 from werkzeug.utils import secure_filename
 import os
@@ -16,6 +18,7 @@ import time
 
 
 app = Flask(__name__)
+socketio = SocketIO(app, cors_allowed_origins="*")
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 ENV = 'dev'
@@ -130,6 +133,16 @@ def login_required(f):
             return redirect(url_for('login'))
     return wrap
 
+def login_required(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'logged_in' in session:
+            return f(*args, **kwargs)
+        else:
+            flash('You need to login first')
+            return redirect(url_for('login'))
+    return wrap
+
 @app.route('/')
 def entry():
     return render_template("login.html")
@@ -167,6 +180,9 @@ def register():
 
 @app.route('/login',methods=['POST', 'GET'])
 def login():
+    if request.method=='POST':
+        nameIN = request.form['username']
+        passwordIN = request.form['password'].encode('utf-8')
     if request.method=='POST':
         nameIN = request.form['username']
         passwordIN = request.form['password'].encode('utf-8')
@@ -225,6 +241,7 @@ def blockedPosts():
         return (redirect('blockedPosts'))
 
 @app.route('/home', methods=['POST', 'GET'])
+@login_required
 @login_required
 def home():
     avatarDictionary = {}
@@ -353,6 +370,7 @@ def profile(name):
 
 @app.route('/Friends', methods=['POST', 'GET'])
 @login_required
+@login_required
 def friend():
     #getting userid then getting friends and filling friendlist
     user= db.session.query(accounts.userID).filter_by(username=session.get('name')).first()
@@ -378,18 +396,30 @@ def messanger(name, friendname):
     allmsgs = sentmsgs + receivedmsgs
     allmsgs.sort()
     #print(allmsgs)
+    #print(allmsgs)
 
     if request.method == 'GET':
         return render_template("messanger.html", title="Messanger", msgsALL=allmsgs, msgsSent=sentmsgs, msgsReceived=receivedmsgs, sendersID=usersID[0], friend=friendname, friendID=friendsID[0], name=session.get('name'), userlevel=session.get('userlevel'),navMarketItems=session.get('top5Items'))
 
 @app.route('/CreatePost', methods=['POST', 'GET'])
 @login_required
+@login_required
 def Post():
     def render_picture(data):
         render_pic = base64.b64encode(data).decode('ascii')
         return render_pic
 
+    def render_picture(data):
+        render_pic = base64.b64encode(data).decode('ascii')
+        return render_pic
+
     if request.method == 'POST':
+        account = accounts.query.filter_by(username=session.get('name')).first()
+        userid = account.userID
+        blocked = "false"
+        if 'usertext' not in request.form:
+            flash('Post requires text')
+            return redirect(request.url)
         account = accounts.query.filter_by(username=session.get('name')).first()
         userid = account.userID
         blocked = "false"
@@ -412,8 +442,10 @@ def Post():
                 return redirect(request.url)
         else:
             post = posts(uID=userid,image=None, filename=None,mimetype=None, description=usertext, blocked=blocked)
+            post = posts(uID=userid,image=None, filename=None,mimetype=None, description=usertext, blocked=blocked)
         db.session.add(post)
         db.session.commit()
+        return redirect(url_for('home'))
         return redirect(url_for('home'))
     if request.method == 'GET':
         return render_template("createpost.html", title="Create Post", name=session.get('name'),
@@ -422,6 +454,7 @@ def Post():
 
 # gian will add the post through a form post and we will take it and add it to our database
 @app.route('/AddAccount', methods=['POST', 'GET'])
+@login_required
 @login_required
 def addaccount():
     allusers = db.session.query(accounts.username).all()
@@ -504,7 +537,9 @@ def handle_event_joined(data):
     #new room is a room which the user joins when they select a friend to receive messages from and send to
     newRoom = data['userID'] +":" + data['friendID']  #the room is only for this user, not the friend
     #print(newRoom)
+    #print(newRoom)
     join_room(newRoom)
+    #print(data)
     #print(data)
 
 @socketio.on("sendMessage")
@@ -518,6 +553,8 @@ def handle_sendMessage_event(data):
     #sending message to the friends receiving room for our user
     sendToRoom = data['friendID'] + ":" + data['userID']
     socketio.emit('receiveMessage',data,room=sendToRoom)
+    #print("sending to: "+sendToRoom)
+    #print(data)
     #print("sending to: "+sendToRoom)
     #print(data)
 
