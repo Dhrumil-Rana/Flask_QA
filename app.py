@@ -8,8 +8,6 @@ from werkzeug.utils import secure_filename
 import requests
 import json
 
-
-
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
