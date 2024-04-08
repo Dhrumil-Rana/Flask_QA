@@ -13,8 +13,10 @@
             <textarea rows="4" cols="80" name="usertext" wrap="hard" placeholder="Enter your thoughts here." form="userpost"></textarea><br>
             <label for="img">Attach image:</label>
             <input type="file" id="img" name="img" accept=".png, .jpg, .jpeg .gif"><br>
+            <input type="file" id="img" name="img" accept=".png, .jpg, .jpeg .gif"><br>
             {% if filename %}
             <div>
+            <center><img src="data:{{post.mimetype}};base64,{{post.image}}" width="300"/></center>
             <center><img src="data:{{post.mimetype}};base64,{{post.image}}" width="300"/></center>
             </div>
             {% endif %}

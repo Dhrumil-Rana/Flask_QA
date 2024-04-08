@@ -39,6 +39,7 @@
 
 
 h7{
+    font-family: Arial;
     text-align: left;
     min-height: 30px;
     font-size: small;
@@ -48,6 +49,11 @@ h7{
 
 
 h8{
+    margin-top: 10px;
+    alignment: center;
+    align-items: center;
+    text-align: center;
+    font-family: Arial;
     color: white;
     font-size: small;
     word-break: normal;

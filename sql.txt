@@ -42,7 +42,7 @@ create table messages(
 );
 
 
-This is for the app.py models
+#This is for the app.py models
 
 class accounts(db.Model):
     __tablename__ = 'accounts'
