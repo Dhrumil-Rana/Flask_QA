@@ -11,7 +11,7 @@
         socket.on('connect', function () {
             socket.emit('joined', {
                 user:"{{ name }}",
-                userID:"{{ sendersID }}",
+                userid:"{{ sendersID }}",
                 friendID:"{{ friendID }}",
                 friend:'{{ friend }}'
             })
@@ -26,7 +26,7 @@
 
                     socket.emit('sendMessage', {
                         user:"{{ name }}",
-                        userID:"{{ sendersID }}",
+                        userid:"{{ sendersID }}",
                         friendID:"{{ friendID }}",
                         friend:"{{ friend }}",
                         message:message

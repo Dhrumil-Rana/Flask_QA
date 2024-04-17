@@ -1,6 +1,6 @@
 <p align="center">
   <a href="" rel="noopener">
- <img width=200px height=200px src="https://i.imgur.com/6wj0hh6.jpg" alt="Project logo"></a>
+ <img width=200px height=200px src="https://upload.wikimedia.org/wikipedia/commons/8/83/Steam_icon_logo.svg" alt="Project logo"></a>
 </p>
 
 <h3 align="center">Steam Market for Skin</h3>
@@ -16,7 +16,7 @@
 
 ---
 
-<p align="center">This project is for Gamers who love to buy/sell their skins on the steam platform. This project will help the users to market their skins in different games
+<p align="center">This project is for Gamers who love to buy/sell their skins on the steam platform. This project will help the users to market their skins in different games. You can also chat with your friends and see the popular market items. 
     <br> 
 </p>
 
@@ -45,6 +45,8 @@ These instructions will get you a copy of the project up and running on your loc
 What things you need to install the software and how to install them.
 
 ```
+This project uses postgreSQL and you need to create a database and then run the queries from **table.sql** to create a table.
+
 Create a virtual environment:
 python -m venv <name>
 Activate it:
@@ -61,63 +63,72 @@ flask run
 
 A step by step series of examples that tell you how to get a development env running.
 
-Say what the step will be
+```
+Run Flask app locally:
+flask run
 
 ```
-Give the example
 ```
-
-And repeat
-
+Login page
 ```
-until finished
-```
+ <a href="" rel="Login Page">
+ <img  src="img/login.png" width = "1500px" alt="Project logo"></a>
 
-End with an example of getting some data out of the system or using it for a little demo.
+ ```
+ Register Page
+ ```
+ <a href="/register" rel="Register Page">
+ <img src = "img/register.png" width = "1500px" alt="Register Page"></a>
 
-## 🔧 Running the tests <a name = "tests"></a>
+ ```
+ Post page
+ ```
+ <a>
+ <img src = "img/post.png" width = "1500px" alt="post Page"></a>
 
-Explain how to run the automated tests for this system.
+ ```
+ Top Market items (CS Go)
+ ```
+  <a>
+ <img src = "img/market.png" width = "1500px" alt="market Page"></a>
+ 
+ ```
+ search bar for items
+ ```
+   <a>
+ <img src = "img/search.png" width = "1500px" alt="search Page"></a>
 
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
+ 
 
 ## 🎈 Usage <a name="usage"></a>
 
-Add notes about how to use the system.
+- User needs to register first. Don't add your password directly in the database as I am using the bycrpyt to  encrypt the passwords. You need to give them the steam id as a mandatory field. Here is the sample steam id: 76561198262264130
+
+- It is used for gamers to show their skins to other friends and it will also help users to talk about the skin they have bought or sold.
+
 
 ## 🚀 Deployment <a name = "deployment"></a>
 
-Add additional notes about how to deploy this on a live system.
+- This code was deployed to heruko as a live server.
+- Create an account in heruko 
+- Create a database with schema name of public
+- Create the tables in the postgresql in heruko using sql file provided in table.sql
+- Connect this repo  to your heroku app by following instructions on [heroku](https://devcenter.heroku.com/articles/github-integration)
+- Run the code. 
 
 ## ⛏️ Built Using <a name = "built_using"></a>
 
-- [MongoDB](https://www.mongodb.com/) - Database
-- [Express](https://expressjs.com/) - Server Framework
-- [VueJs](https://vuejs.org/) - Web Framework
-- [NodeJs](https://nodejs.org/en/) - Server Environment
+- [PostgreSQL](https://www.postgresql.org/) - Database
+- [Flask](https://flask.palletsprojects.com/en/3.0.x/) - Server Framework
+- [HTML](https://html.com/) -  For Building Markup pages
+- [CSS](https://developer.mozilla.org/en-US/docs/Web/CSS) - To design the webpages  
+- [javascript] (https://www.javascript.com/)  - Used to make the website interactive
+- [backpack api](https://docs.backpack.exchange/) - API  used to get data about CS:GO market items
 
 ## ✍️ Authors <a name = "authors"></a>
 
-- [@kylelobo](https://github.com/kylelobo) - Idea & Initial work
-
-See also the list of [contributors](https://github.com/kylelobo/The-Documentation-Compendium/contributors) who participated in this project.
+- [@Dhrumil Rana](https://github.com/Dhrumil-Rana) - Idea & Initial work
 
 ## 🎉 Acknowledgements <a name = "acknowledgement"></a>
-
-- Hat tip to anyone whose code was used
-- Inspiration
+- Inspiration: Steam  Community Market
 - References

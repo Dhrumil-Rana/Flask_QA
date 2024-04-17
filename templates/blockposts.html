@@ -11,7 +11,7 @@
         {% if post.blocked=='true' %}
         <div id="currpost" class="currpost">
             {% for user in users %}
-                {% if post.uID == user.userID %}
+                {% if post.uID == user.userid %}
                     <center><h6><p style="color:white";>Posted by: {{user.username}}</p></h6></center>
                 {% endif %}
             {% endfor %}
@@ -24,7 +24,7 @@
             {% for comment in comments %}
                 {% if comment.postID == post.postID %}
                     {% for user in users %}
-                        {% if comment.commenterID==user.userID %}
+                        {% if comment.commenterID==user.userid %}
                             <div class="comments"><h6><p>{{ user.username }} commented: {{ comment.textComment }}</p></h6></div>
                         {% endif %}
                     {% endfor %}
