@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>Login Page</title>
+        <title>{{ title }}</title>
         <link rel="stylesheet" type = "text/css" href="{{ url_for('static' , filename='css/login.css') }}">
     </head>
     <body>
@@ -15,14 +15,9 @@
                 <input type="text" placeholder="Enter username" id="username" name='username'><br><br>
                 <label for="password">Password</label><br>
                 <input type="password" placeholder="Enter password" id="password" name='password'><br><br><br>
-                <input type="submit" value="Login">
+                <input type="submit" value="Login"> <br><br>
                 <p><a style="color:white" href="{{url_for('register')}}"> Register?</a></p>
             </div><br>
         </form>
-        {% if info is defined and info|length %}
-            <div class="alert">
-                <h2>{{info}}</h2>
-            </div>
-        {% endif %}
     </body>
 </html>

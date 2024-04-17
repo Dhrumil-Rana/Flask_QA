@@ -2,11 +2,9 @@ from flask import Flask,request,render_template,session,redirect,url_for,flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO, send, emit, ConnectionRefusedError, join_room
 from functools import wraps
-from functools import wraps
 import pickle
 import bcrypt
 import urllib.request
-import base64
 import base64
 from werkzeug.utils import secure_filename
 import os
@@ -16,10 +14,9 @@ from datetime import datetime
 import time
 
 
-
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
-socketio = SocketIO(app, cors_allowed_origins="*")
+#socketio = SocketIO(app, cors_allowed_origins="*")
 
 ENV = 'dev'
 select_database = 'dhrumil'
@@ -28,7 +25,7 @@ select_database = 'dhrumil'
 if ENV == 'dev':
     app.debug = True
     if select_database == 'dhrumil':
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://u4h1cea4c9980i:p997574b11e47e8fd0a97729722f47a83071744a7007bcd658373e880ae43266c@cb4l59cdg4fg1k.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/dnc99nerpmtjr'
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:Nottohack%40%40@localhost/Game'
     else:
         app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:almin123@localhost/flaskwebsite490'
 # this one is for the heruko
@@ -57,7 +54,7 @@ def allowed_file(filename):
 
 class accounts(db.Model):
     __tablename__ = 'accounts'
-    userID = db.Column(db.Integer, primary_key=True)
+    userid = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.VARCHAR(), unique=True)
     password = db.Column(db.VARCHAR(), unique=False)
     role = db.Column(db.CHAR(1))
@@ -73,7 +70,7 @@ class accounts(db.Model):
 class posts(db.Model):
     __tablename__ = 'posts'
     postID = db.Column(db.Integer, primary_key=True)
-    uID = db.Column(db.Integer, db.ForeignKey('accounts.userID'), nullable=False)
+    uID = db.Column(db.Integer, db.ForeignKey('accounts.userid'), nullable=False)
     image = db.Column(db.Text, nullable=True)
     description = db.Column(db.VARCHAR, nullable=True)
     filename = db.Column(db.Text, nullable=True)
@@ -92,7 +89,7 @@ class posts(db.Model):
 class comments(db.Model):
     __tablename__ = 'comments'
     commentID = db.Column(db.Integer, primary_key=True)
-    commenterID = db.Column(db.Integer, db.ForeignKey('accounts.userID'), nullable=False)
+    commenterID = db.Column(db.Integer, db.ForeignKey('accounts.userid'), nullable=False)
     textComment = db.Column(db.VARCHAR(), nullable=False)
     postID = db.Column(db.Integer, db.ForeignKey(posts.postID), nullable=False)
 
@@ -104,11 +101,11 @@ class comments(db.Model):
 class friends(db.Model):
     __tablename__ = 'friends'
     Number = db.Column(db.Integer, primary_key=True)
-    userID = db.Column(db.Integer)
-    friendID = db.Column(db.Integer, db.ForeignKey('accounts.userID'), nullable=False)
+    userid = db.Column(db.Integer)
+    friendID = db.Column(db.Integer, db.ForeignKey('accounts.userid'), nullable=False)
 
-    def __init__(self, userID, friendID):
-        self.userID = userID
+    def __init__(self, userid, friendID):
+        self.userid = userid
         self.friendID = friendID
 
 class message(db.Model):
@@ -248,12 +245,12 @@ def home():
     allUsers = accounts.query.all()
     for u in allUsers:
         getUserInfo = requests.get("https://backpack.tf/api/users/info/v1?steamids=" + u.steamid + "&key=6183f13deea7b76faf43ee48")
-        getUserInfo = getUserInfo.content;
+        getUserInfo = getUserInfo.content
         getUserInfo = json.loads(getUserInfo)
-        getUserInfo = getUserInfo['users']
-        getUserInfo = getUserInfo[u.steamid]
-        getUserInfo = getUserInfo['avatar']
-        avatarDictionary[u.userID]=getUserInfo
+        getUserInfo = getUserInfo['users'][u.steamid]['avatar']
+        #getUserInfo = getUserInfo[u.steamid]
+        #getUserInfo = getUserInfo['avatar']
+        avatarDictionary[u.userid]=getUserInfo
 
     if request.method == 'GET':
         post = posts.query.all()
@@ -277,10 +274,10 @@ def home():
         user = accounts.query.all()
 
         if 'comment' in request.form:
-            userID = db.session.query(accounts.userID).filter_by(username=session.get('name')).first()
+            userid = db.session.query(accounts.userid).filter_by(username=session.get('name')).first()
             commenttext=request.form['comment_input']
             postID=request.form['postID']
-            commentSEND = comments(textComment=commenttext, commenterID=userID, postID=postID)
+            commentSEND = comments(textComment=commenttext, commenterID=userid, postID=postID)
             db.session.add(commentSEND)
             db.session.commit()
         return redirect('home')
@@ -321,16 +318,16 @@ def profile(name):
     invCount = invItems['total_inventory_count'];
     invItems = invItems['descriptions'];
 
-    profileid = db.session.query(accounts.userID).filter_by(username=name).first()
-    currentuserid = db.session.query(accounts.userID).filter_by(username=session.get('name')).first()
-    friendExist = db.session.query(friends).filter_by(friendID=profileid,userID=currentuserid).first()
+    profileid = db.session.query(accounts.userid).filter_by(username=name).first()
+    currentuserid = db.session.query(accounts.userid).filter_by(username=session.get('name')).first()
+    friendExist = db.session.query(friends).filter_by(friendID=profileid,userid=currentuserid).first()
     if friendExist is not None:
         isFriend="True"
     else:
         isFriend="False"
 
     if request.method == 'GET':
-        userid=db.session.query(accounts.userID).filter_by(username=name).first()
+        userid=db.session.query(accounts.userid).filter_by(username=name).first()
         post = db.session.query(posts).filter_by(uID=userid).all()
         commentlist = comments.query.all()
         user = accounts.query.all()
@@ -339,12 +336,12 @@ def profile(name):
     if request.method =='POST':
         if 'addfriend' in request.form:
             requestername=session.get('name')
-            requesterID = db.session.query(accounts.userID).filter_by(username=requestername).first()
+            requesterID = db.session.query(accounts.userid).filter_by(username=requestername).first()
             addfriendname=name
-            friendID = db.session.query(accounts.userID).filter_by(username=addfriendname).first()
-            friend = friends(friendID=requesterID,userID=friendID)
+            friendID = db.session.query(accounts.userid).filter_by(username=addfriendname).first()
+            friend = friends(friendID=requesterID,userid=friendID)
             db.session.add(friend)
-            friend2 = friends(friendID=friendID, userID=requesterID)
+            friend2 = friends(friendID=friendID, userid=requesterID)
             db.session.add(friend2)
             db.session.commit()
 
@@ -360,10 +357,10 @@ def profile(name):
         user = accounts.query.all()
 
         if 'comment' in request.form:
-            userID = db.session.query(accounts.userID).filter_by(username=session.get('name')).first()
+            userid = db.session.query(accounts.userid).filter_by(username=session.get('name')).first()
             commenttext=request.form['comment_input']
             postID=request.form['postID']
-            commentSEND = comments(textComment=commenttext, commenterID=userID, postID=postID)
+            commentSEND = comments(textComment=commenttext, commenterID=userid, postID=postID)
             db.session.add(commentSEND)
             db.session.commit()
         return redirect(name)
@@ -373,11 +370,11 @@ def profile(name):
 @login_required
 def friend():
     #getting userid then getting friends and filling friendlist
-    user= db.session.query(accounts.userID).filter_by(username=session.get('name')).first()
-    friendIDlist=db.session.query(friends.friendID).filter_by(userID=user)
+    user= db.session.query(accounts.userid).filter_by(username=session.get('name')).first()
+    friendIDlist=db.session.query(friends.friendID).filter_by(userid=user)
     friendlist = []
     for friendID in friendIDlist:
-        f = db.session.query(accounts.username).filter_by(userID=friendID).first()
+        f = db.session.query(accounts.username).filter_by(userid=friendID).first()
         friendlist.append(f)
     # getting userid then getting friends and filling friendlist
     #print(friendlist)
@@ -389,8 +386,8 @@ def friend():
 def messanger(name, friendname):
     msgToSend = ''
     sender = session.get('name')
-    friendsID = db.session.query(accounts.userID).filter_by(username=friendname).first()  #receiver
-    usersID = db.session.query(accounts.userID).filter_by(username=session.get('name')).first() #sender or current user
+    friendsID = db.session.query(accounts.userid).filter_by(username=friendname).first()  #receiver
+    usersID = db.session.query(accounts.userid).filter_by(username=session.get('name')).first() #sender or current user
     sentmsgs = db.session.query(message.msgID,message.msg,message.senderID).filter_by(senderID=usersID,receiverID=friendsID).all() #msgs sent by the current user to friend
     receivedmsgs = db.session.query(message.msgID,message.msg,message.senderID).filter_by(senderID=friendsID,receiverID=usersID).all() #msgs sent by friend to current user
     allmsgs = sentmsgs + receivedmsgs
@@ -415,13 +412,13 @@ def Post():
 
     if request.method == 'POST':
         account = accounts.query.filter_by(username=session.get('name')).first()
-        userid = account.userID
+        userid = account.userid
         blocked = "false"
         if 'usertext' not in request.form:
             flash('Post requires text')
             return redirect(request.url)
         account = accounts.query.filter_by(username=session.get('name')).first()
-        userid = account.userID
+        userid = account.userid
         blocked = "false"
         if 'usertext' not in request.form:
             flash('Post requires text')
@@ -482,10 +479,10 @@ def addaccount():
 @login_required
 def search():
     if 'comment' in request.form:
-        userID = db.session.query(accounts.userID).filter_by(username=session.get('name')).first()
+        userid = db.session.query(accounts.userid).filter_by(username=session.get('name')).first()
         commenttext = request.form['comment_input']
         postID = request.form['postID']
-        commentSEND = comments(textComment=commenttext, commenterID=userID, postID=postID)
+        commentSEND = comments(textComment=commenttext, commenterID=userid, postID=postID)
         db.session.add(commentSEND)
         db.session.commit()
         return redirect("home")
@@ -518,9 +515,9 @@ def searchMarketItems():
     if request.method =='POST':
         searchTerm = request.form['search']
         getAllItems = requests.get('https://steamcommunity.com/market/search/render/?query='+searchTerm+'&category_730_ItemSet%5B%5D=any&category_730_ProPlayer%5B%5D=any&category_730_StickerCapsule%5B%5D=any&category_730_TournamentTeam%5B%5D=any&category_730_Weapon%5B%5D=any&appid=730&norender=1')
-        allItems = getAllItems.content;
-        allItems = json.loads(allItems);
-        allItems = allItems['results'];
+        allItems = getAllItems.content
+        allItems = json.loads(allItems)
+        allItems = allItems['results']
         empty='not'
         if allItems==[]:
             print("empty")
@@ -535,7 +532,7 @@ def searchMarketItems():
 @socketio.on("joined")
 def handle_event_joined(data):
     #new room is a room which the user joins when they select a friend to receive messages from and send to
-    newRoom = data['userID'] +":" + data['friendID']  #the room is only for this user, not the friend
+    newRoom = data['userid'] +":" + data['friendID']  #the room is only for this user, not the friend
     #print(newRoom)
     #print(newRoom)
     join_room(newRoom)
@@ -546,12 +543,12 @@ def handle_event_joined(data):
 def handle_sendMessage_event(data):
 
     #adding message to the database
-    messageSEND = message(msg=data['message'], senderID=data['userID'], receiverID=data['friendID'])
+    messageSEND = message(msg=data['message'], senderID=data['userid'], receiverID=data['friendID'])
     db.session.add(messageSEND)
     db.session.commit()
 
     #sending message to the friends receiving room for our user
-    sendToRoom = data['friendID'] + ":" + data['userID']
+    sendToRoom = data['friendID'] + ":" + data['userid']
     socketio.emit('receiveMessage',data,room=sendToRoom)
     #print("sending to: "+sendToRoom)
     #print(data)

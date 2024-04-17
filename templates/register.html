@@ -19,13 +19,7 @@
                 <input type="steamid" required placeholder="Enter Steam ID" id="steamid" name='steamid'><br>
                 <p style="color:white;">Steam profile and inventory must be public</p>
                 <input type="submit" value="Register">
-                <p><a style="color:white" href="{{url_for('login')}}">Back to log in</a></p>
             </div><br>
         </form>
-    {% if info is defined and info|length %}
-            <div class="alert">
-                <h2>{{info}}</h2>
-            </div>
-    {% endif %}
     </body>
 </html>
