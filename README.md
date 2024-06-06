@@ -123,8 +123,8 @@ Login page
 - [HTML](https://html.com/) -  For Building Markup pages
 - [CSS](https://developer.mozilla.org/en-US/docs/Web/CSS) - To design the webpages  
 - [JavaScript](https://www.javascript.com/)  - Used to make the website interactive
-- [backpack api](https://docs.backpack.exchange/) - API  used to get data about CS:GO market items
-- [Steam Community Market](https://steamcommunity.com/market/) - Used to retrieve CS item prices and information
+- [backpack api](https://docs.backpack.exchange/) - API  used to get data about user's inventories
+- [Steam Community Market API](https://steamcommunity.com/market/) - API used to retrieve CS item prices and information
 
 ## ✍️ Authors <a name = "authors"></a>
 
