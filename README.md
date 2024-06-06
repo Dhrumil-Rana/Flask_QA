@@ -16,7 +16,7 @@
 
 ---
 
-<p align="center">This project is for Gamers who love to buy/sell their skins on the steam platform. This project will help the users to market their skins in different games. You can also chat with your friends and see the popular market items. 
+<p align="center">This Social Media project is for Steam users who love to buy/sell their Counter-Strike skins on the Steam platform. This project will help users market their skins in a different way. You can also chat with your friends and search through the most popular Steam Community Market items for Counter-Strike.
     <br> 
 </p>
 
@@ -34,7 +34,7 @@
 
 ## 🧐 About <a name = "about"></a>
 
-Steam Market users would like to showcase and share their skins that are for sale through screenshots, public posts and friends in a way that is similar to social media platforms, and the current implementation on Steam does not work this way. This project is a web application that provides an interface for this while also acting as a social media platform complete with profiles, friends, messaging, image/text posts and comments.
+Steam Community Market users would like to showcase and share their skins that are for sale through screenshots, public posts and friends in a way that is similar to social media platforms, and the current implementation on Steam does not work this way. This project is a web application that provides an interface for this while also acting as a social media platform complete with profiles, friends, messaging, image/text posts and comments.
 
 ## 🏁 Getting Started <a name = "getting_started"></a>
 
@@ -123,7 +123,7 @@ Login page
 - [HTML](https://html.com/) -  For Building Markup pages
 - [CSS](https://developer.mozilla.org/en-US/docs/Web/CSS) - To design the webpages  
 - [JavaScript](https://www.javascript.com/)  - Used to make the website interactive
-- [backpack api](https://docs.backpack.exchange/) - API  used to get data about user's inventories
+- [backpack.tf api](https://backpack.tf/api/index.html) - API  used to get data about user's inventories
 - [Steam Community Market API](https://steamcommunity.com/market/) - API used to retrieve CS item prices and information
 
 ## ✍️ Authors <a name = "authors"></a>
@@ -134,4 +134,4 @@ Login page
 
 ## 🎉 Acknowledgements <a name = "acknowledgement"></a>
 - Inspiration: Steam  Community Market
-- References
+- References: https://backpack.tf/developer 
