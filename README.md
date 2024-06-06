@@ -34,7 +34,7 @@
 
 ## 🧐 About <a name = "about"></a>
 
-Steam Market users would like to showcase their skins that are for sale through public posts and friends, but the current implementation on steam is not perfect. This project will simulate that feature.This project is a web application that provides an interface while also acting as a social media platform.
+Steam Market users would like to showcase and share their skins that are for sale through screenshots, public posts and friends in a way that is similar to social media platforms, and the current implementation on Steam does not work this way. This project is a web application that provides an interface for this while also acting as a social media platform complete with profiles, friends, messaging, image/text posts and comments.
 
 ## 🏁 Getting Started <a name = "getting_started"></a>
 
