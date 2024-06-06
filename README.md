@@ -122,13 +122,14 @@ Login page
 - [Flask](https://flask.palletsprojects.com/en/3.0.x/) - Server Framework
 - [HTML](https://html.com/) -  For Building Markup pages
 - [CSS](https://developer.mozilla.org/en-US/docs/Web/CSS) - To design the webpages  
-- [javascript] (https://www.javascript.com/)  - Used to make the website interactive
+- [JavaScript](https://www.javascript.com/)  - Used to make the website interactive
 - [backpack api](https://docs.backpack.exchange/) - API  used to get data about CS:GO market items
+- [Steam Community Market](https://steamcommunity.com/market/) - Used to retrieve CS item prices and information
 
 ## ✍️ Authors <a name = "authors"></a>
 
 - [@Alminb](https://github.com/alminb) - Idea, Project Management, Frontend & Backend Integration, Website Code
-- [@Dhrumil Rana](https://github.com/Dhrumil-Rana) - Backend/Database, Website Deployment
+- [@Dhrumil Rana](https://github.com/Dhrumil-Rana) - Methodology, Backend/Database, Website Deployment
 - [@Gian](https://github.com/gco129) - Frontend/Design
 
 ## 🎉 Acknowledgements <a name = "acknowledgement"></a>
