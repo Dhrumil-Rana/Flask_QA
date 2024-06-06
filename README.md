@@ -127,7 +127,9 @@ Login page
 
 ## ✍️ Authors <a name = "authors"></a>
 
-- [@Dhrumil Rana](https://github.com/Dhrumil-Rana) - Idea & Initial work
+- [@Alminb](https://github.com/alminb) - Idea, Project Management, Frontend & Backend Integration, Website Code
+- [@Dhrumil Rana](https://github.com/Dhrumil-Rana) - Backend/Database
+- [@Gian](https://github.com/gco129) - Frontend/Design
 
 ## 🎉 Acknowledgements <a name = "acknowledgement"></a>
 - Inspiration: Steam  Community Market
