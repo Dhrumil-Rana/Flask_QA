@@ -34,7 +34,7 @@
 
 ## 🧐 About <a name = "about"></a>
 
-Gamers like to showcase their skins as well as they want to sell the skins  on Steam marketplace, but it's not available on steam currently. This project will simulate that feature.This project is a web application that provides an interface. 
+Steam Market users would like to showcase their skins that are for sale through public posts and friends, but the current implementation on steam is not perfect. This project will simulate that feature.This project is a web application that provides an interface while also acting as a social media platform.
 
 ## 🏁 Getting Started <a name = "getting_started"></a>
 
