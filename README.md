@@ -128,8 +128,8 @@ Login page
 
 ## ✍️ Authors <a name = "authors"></a>
 
-- [@Alminb](https://github.com/alminb) - Idea, Project Management, Frontend & Backend Integration, Website Code
 - [@Dhrumil Rana](https://github.com/Dhrumil-Rana) - Methodology, Backend/Database, Website Deployment
+- [@Alminb](https://github.com/alminb) - Idea, Website Code
 - [@Gian](https://github.com/gco129) - Frontend/Design
 
 ## 🎉 Acknowledgements <a name = "acknowledgement"></a>
