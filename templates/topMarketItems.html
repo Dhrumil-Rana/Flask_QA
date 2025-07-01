@@ -1,15 +1,37 @@
-{% extends 'layout.html' %}
-
-{% block css %}
-    <link rel="stylesheet" type = "text/css" href="{{ url_for ('static' , filename='css/market.css') }}">
-{% endblock %}
-
-{% block content %}
-    <h1 class="result">
-            Top 20 CS:GO items currently being sold and bought on the Steam Community Market. <br><br>
-    </h1>
-    <h3 style="min-height:55px"><p style="color:white"><span style="float:left;margin-left:2%">Item Name</span><span style="float:right;margin-right:2%"> Current Price</span></p></h3>
-    {% for item in items %}
-        <h3><p style="color:white";><img src="https://community.akamai.steamstatic.com/economy/image/{{ (item.asset_description).icon_url }}/360fx360f"/><span style="float:left;margin-top:3%;margin-left:2%">{{item.hash_name}}</span>  <span style="color:white;float:right;margin-top:3%;margin-right:5%">{{item.sale_price_text}}</span></p></h3>
-    {% endfor %}
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top Market Items</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Top Market Items</h1>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('app.home') }}">Home</a></li>
+                <li><a href="{{ url_for('app.logout') }}">Logout</a></li>
+                <li><a href="{{ url_for('app.friends') }}">Friends</a></li>
+                <li><a href="{{ url_for('app.profile', name=session.get('name')) }}">Profile</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>Top Market Items</h2>
+        <div class="market-items">
+            {% for item in items %}
+                <div class="item">
+                    <h3>{{ item.name }}</h3>
+                    <img src="{{ item.icon_url }}" alt="{{ item.name }}">
+                    <p>Price: {{ item.price }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2023 Flask QA App</p>
+    </footer>
+</body>
+</html>

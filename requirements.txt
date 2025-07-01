@@ -1,0 +1,13 @@
+psycopg2-binary
+Flask
+boto3
+Flask-SQLAlchemy
+Flask-SocketIO
+Flask-WTF
+bcrypt
+requests
+python-dotenv
+Werkzeug
+jsonschema
+bcrypt
+flask-socketio

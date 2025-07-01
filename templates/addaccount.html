@@ -1,35 +1,40 @@
-{% extends 'layout.html' %}
-
-{% block css %}
-    <link rel="stylesheet" type = "text/css" href="{{ url_for ('static' , filename='css/post.css') }}">
-{% endblock %}
-
-{% block content %}
-    <head>
-        <meta charset="UTF-8">
-        <title>Login Page</title>
-        <link rel="stylesheet" type = "text/css" href="{{ url_for('static' , filename='css/login.css') }}">
-    </head>
-    <h1 class="post">Add Account</h1>
-    <form action="/AddAccount" id="addaccount" method="post" title="AddAccount">
-            <div class="submission">
-                <label>Add a new account</label><br><br>
-                <label for="username">Username</label><br>
-                <input type="text" placeholder="Enter username" id="username" name='username'><br><br>
-                <label for="password">Password</label><br>
-                <input type="password" placeholder="Enter password" id="password" name='password'><br><br><br>
-                <label for="steamid">Steam ID</label><br>
-                <input type="steamid" placeholder="Enter Steam ID" id="steamid" name='steamid'><br><br><br>
-                <label for="C1">User</label>
-                <input type="Radio" placeholder="Enter role" id="C1" name='role' value='U'>
-                <label for="C2">Admin</label>
-                <input type="Radio" placeholder="Enter role" id="C2" name='role' value='A'><br><br>
-                <input type="submit" value="Add Account">
-            </div><br>
-        </form>
-        {% if info is defined and info|length %}
-            <div class="alert">
-                <h2>{{info}}</h2>
-            </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Account</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Add Account</h1>
+        {% if info %}
+            <p class="error">{{ info }}</p>
         {% endif %}
-{% endblock %}
+        <form method="POST" action="{{ url_for('app.addaccount') }}">
+            <div>
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div>
+                <label for="steamid">Steam ID:</label>
+                <input type="text" id="steamid" name="steamid" required>
+            </div>
+            <div>
+                <label for="role">Role:</label>
+                <select id="role" name="role" required>
+                    <option value="U">User</option>
+                    <option value="A">Admin</option>
+                </select>
+            </div>
+            <button type="submit">Add Account</button>
+        </form>
+        <a href="{{ url_for('app.home') }}">Back to Home</a>
+    </div>
+</body>
+</html>

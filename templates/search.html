@@ -1,71 +1,56 @@
-{% extends 'layout.html' %}
-
-{% block css %}
-    <link rel="stylesheet" type = "text/css" href="{{ url_for ('static' , filename='css/search.css') }}">
-{% endblock %}
-
-{% block content %}
-    {% if users %}
-        <h2>Users Found:</h2>
-        {% for user in users %}
-            <h2><a href="/profile/{{ user.username }}">{{ user.username }}</a></h2>
-        {% endfor %}
-    {%  else %}
-        <h2>No users found by the name: {{search_txt}}</h2>
-    {% endif %}
-    {% if posts %}
-        <h2>Posts found:</h2>
-        <div id="postlist" class="postlist">
-        {% for post in posts %}
-            {% if post.blocked=='false' %}
-            <div id="currpost" class="currpost">
-                {% if userlevel=='admin' %}
-                    <center><br><form id="blockpost" method="post" >
-                        <input type="hidden" id="postID" name="postID" value="{{ post.postID }}">
-                        <input type="hidden" id="block" name="block">
-                        <button type="submit">Block Post</button>
-                    </form></center>
-                {% endif %}
-                {% for user in everyuser %}
-                    {% if post.uID == user.userid %}
-                        <center><h2><a href="/profile/{{ user.username }}">{{ user.username }}</a></h2></center>
-                    {% endif %}
-                {% endfor %}
-                <div id="postcontent" class="postcontent">
-                {% if post.image != None %}
-	                <center><img src="data:{{post.mimetype}};base64,{{post.image}}" width="300"/></center>
-                {% endif %}
-                <center><h3><p style="color:black";>{{post.description}}</p></h3></center>
-                </div><br>
-
-                <center><div id="commentlist"  class="commentlist">
-                {% for comment in comments %}
-                    {% if comment.postID == post.postID %}
-                        {% for user in everyuser %}
-                            {% if comment.commenterID==user.userid %}
-                                <div class="comments"><h4><p>{{ user.username }} commented: {{ comment.textComment }}</p></h4></div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Search Results</h1>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('app.home') }}">Home</a></li>
+                <li><a href="{{ url_for('app.profile', name=session.get('name')) }}">Profile</a></li>
+                <li><a href="{{ url_for('app.logout') }}">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>Search Results for "{{ search_txt }}"</h2>
+        <section>
+            <h3>Posts</h3>
+            {% if posts %}
+                <ul>
+                    {% for post in posts %}
+                        <li>
+                            <p>{{ post.description }}</p>
+                            {% if post.image %}
+                                <img src="data:{{ post.mimetype }};base64,{{ post.image }}" alt="Post Image">
                             {% endif %}
-                        {% endfor %}
-                    {% endif %}
-                {% endfor %}
-                </div><br>
-                </center>
-
-                <center><form id="sendcomment" method="post" >
-                    <input type="text" id="comment_input" name="comment_input" placeholder="Comment on post">
-                    <input type="hidden" id="comment" name="comment">
-                    <input type="hidden" id="searchtxt" name="searchtxt" value="{{ search_txt }}">
-                    <input type="hidden" id="postID" name="postID" value="{{ post.postID }}">
-                    <button type="submit" id="commentSend">Send</button>
-                </form>
-                </center>
-                <br>
-            </div>
-             {% endif %}
-        {% endfor %}
-        </div>
-    {% else %}
-        <h2>No posts found by the description: {{search_txt}}</h2>
-    {% endif %}
-
-{% endblock %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No posts found.</p>
+            {% endif %}
+        </section>
+        <section>
+            <h3>Users</h3>
+            {% if users %}
+                <ul>
+                    {% for user in users %}
+                        <li>{{ user.username }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No users found.</p>
+            {% endif %}
+        </section>
+    </main>
+    <footer>
+        <p>&copy; {{ current_year }} Flask QA App</p>
+    </footer>
+</body>
+</html>

@@ -3,24 +3,27 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 
-<header>
-  <nav class="bar2">
-    <ul>
-        <li class="bar2">
-            <form action="/search" id="navSearch" method="post">
-            <input type="text" name="search" id ="search" placeholder="Search...">
-            <button type="submit"><i class="fa fa-search"></i></button>
-            <!--<button type="submit" id="searchBtn">Search</button>-->
-            </form>
-        <h8>
-            <p>Top 5 CS:GO items currently being sold and bought on the Steam Community Market.</p><br><br>
-        </h8>
-            <h8 style="min-height:15px"><p style="color:white"><span style="float:left">Item Name</span><span style="float:right"> Current Price</span></p><br></h8>
-            {% for item in navMarketItems %}
-                <h7><p style="color:white";><img id="itemimg" src="https://community.akamai.steamstatic.com/economy/image/{{ (item.asset_description).icon_url }}/360fx360f"/><span style="float:left;max-width:70%">{{item.hash_name}}</span>  <span style="color:white;float:right">{{item.sale_price_text}}</span></p></h7>
-                <br><br><br>
-            {% endfor %}
-        </li>
-    </ul>
-  </nav>
-</header>
+<nav class="sidebar-right">
+  <form action="/search" id="navSearch" method="post" class="search-form">
+    <input type="text" name="search" id="search" placeholder="Search...">
+    <button type="submit"><i class="fa fa-search"></i></button>
+  </form>
+  <div class="market-info">
+    <p class="market-title">Top 5 CS:GO items currently being sold and bought on the Steam Community Market.</p>
+    <div class="market-header">
+      <span>Item Name</span>
+      <span>Current Price</span>
+    </div>
+    <div class="market-list">
+      {% for item in navMarketItems %}
+        <div class="market-item">
+          <img src="https://community.akamai.steamstatic.com/economy/image/{{(item.asset_description).icon_url}}/360fx360f" alt="Item Icon"/>
+          <span class="item-name">{{item.hash_name}}</span>
+          <span class="item-price">{{item.sale_price_text}}</span>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</nav>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/nav2.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">

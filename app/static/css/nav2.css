@@ -1,0 +1,113 @@
+.sidebar-right {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 320px;
+    height: 100vh;
+    background: linear-gradient(to bottom, #2a475e, #1b2838);
+    box-shadow: -2px 0 10px rgba(0,0,0,0.2);
+    z-index: 100;
+    padding: 30px 20px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.search-form {
+    display: flex;
+    margin-bottom: 24px;
+}
+
+.search-form input[type="text"] {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 6px 0 0 6px;
+    border: none;
+    background: #1b2838;
+    color: #fff;
+}
+
+.search-form button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 0 6px 6px 0;
+    background: #66c0f4;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.search-form button:hover {
+    background: #3b8ab8;
+}
+
+.market-info {
+    color: #fff;
+    margin-top: 10px;
+}
+
+.market-title {
+    font-size: 1.05em;
+    margin-bottom: 12px;
+    color: #a4d7f5;
+    text-align: center;
+}
+
+.market-header {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #66c0f4;
+    border-bottom: 1px solid #395f7f;
+    padding-bottom: 4px;
+}
+
+.market-list {
+    max-height: 350px;
+    overflow-y: auto;
+}
+
+.market-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #22304a;
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin-bottom: 8px;
+}
+
+.market-item img {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    margin-right: 10px;
+    border: 1px solid #395f7f;
+    background: #fff;
+}
+
+.item-name {
+    flex: 1;
+    margin-left: 8px;
+    color: #fff;
+    font-size: 1em;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.item-price {
+    color: #66c0f4;
+    font-weight: bold;
+    margin-left: 12px;
+    min-width: 70px;
+    text-align: right;
+}
+
+@media (max-width: 1200px) {
+    .sidebar-right {
+        display: none;
+    }
+}

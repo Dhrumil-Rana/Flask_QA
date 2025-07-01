@@ -1,22 +1,11 @@
-<head>
-  <link rel="stylesheet" type = "text/css" href="{{ url_for('static' , filename='css/nav.css') }}">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-</head>
-
-<header>
-  <nav class="bar" style="width:20%">
-    <ul>
-      <li class="bar">  <a href="/home"><span class="material-icons"> home </span>Home</a></li>
-      <li class="bar"><a href="/CreatePost"><span class="material-icons"> add_circle_outline </span>Create Post</a></li>
-      <li class="bar"><a href="/Friends"><span class="material-icons"> people </span>Friends</a></li>
-      {% if userlevel == 'admin' %}
-          <li class="bar"><a href="/AddAccount"> <span class="material-icons">person_add</span>Add User Account</a></li>
-          <li class="bar"><a href="/blockedPosts"><span class="material-icons"> block  </span> Blocked Posts</a></li>
-      {% endif %}
-    <li class="bar"><a href="/TopMarketItems"><span class="material-icons">store</span>Popular Market Items</a></li>
-    <li class="bar"><a href="/SearchMarketItems"><span class="material-icons">content_paste_search</span>Search Market Items</a></li>
-    <li class="bar"><a href="/profile/{{ name }}"><span class="material-icons">account_circle</span>Profile</a></li>
-    <li class="bar" style="float:right"><a href="/logout"> <span class="material-icons">logout</span>Sign Out</a></li>
-    </ul>
-  </nav>
-</header>
+<nav class="sidebar">
+  <ul>
+    <li><a href="/blockedPosts"><span class="material-icons">block</span>Blocked Posts</a></li>
+    <li><a href="/TopMarketItems"><span class="material-icons">store</span>Popular Market Items</a></li>
+    <li><a href="/SearchMarketItems"><span class="material-icons">content_paste_search</span>Search Market Items</a></li>
+    <li><a href="/profile/{{ name }}"><span class="material-icons">account_circle</span>Profile</a></li>
+    <li><a href="{{ url_for('app.logout') }}"><span class="material-icons">logout</span>Sign Out</a></li>
+  </ul>
+</nav>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/nav.css') }}">

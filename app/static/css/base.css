@@ -1,0 +1,105 @@
+/* Reset and base styles */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: Georgia, serif;
+    background: linear-gradient(to bottom, #171a21, #1b2838) fixed;
+    color: #fff;
+}
+
+a {
+    color: #66c0f4;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+a:hover {
+    color: #a4d7f5;
+    text-decoration: underline;
+}
+
+.container {
+    background: linear-gradient(135deg, #2a475e 60%, #395f7f 100%);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    padding: 40px 32px 32px 32px;
+    width: 350px;
+    max-width: 90vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 40px auto;
+}
+
+h1, h2, h3 {
+    color: #fff;
+    margin-bottom: 16px;
+    letter-spacing: 1px;
+}
+
+ul, ol {
+    padding-left: 1.2em;
+}
+
+button, input[type="submit"] {
+    border: none;
+    border-radius: 20px;
+    background: linear-gradient(90deg, #2a475e 60%, #1b2838 100%);
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    transition: background 0.2s, transform 0.1s;
+    padding: 10px 24px;
+    margin-top: 8px;
+}
+
+button:hover, input[type="submit"]:hover {
+    background: linear-gradient(90deg, #1b2838 60%, #2a475e 100%);
+    transform: translateY(-2px) scale(1.03);
+}
+
+input, textarea, select {
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    background: #1b2838;
+    color: #fff;
+    font-size: 1rem;
+    margin-bottom: 8px;
+    outline: none;
+    transition: background 0.2s;
+}
+
+input:focus, textarea:focus, select:focus {
+    background: #22304a;
+}
+
+.flashes {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 16px;
+    width: 100%;
+}
+
+.flashes li {
+    background: #c0392b;
+    color: #fff;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 8px;
+    text-align: center;
+    font-weight: bold;
+}
+
+@media (max-width: 600px) {
+    .container {
+        padding: 24px 8px;
+        width: 98vw;
+    }
+    h1, h2 {
+        font-size: 1.3rem;
+    }
+}

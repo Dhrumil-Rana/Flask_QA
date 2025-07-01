@@ -1,69 +1,51 @@
-{% extends 'layout.html' %}
-
-{% block css %}
-    <link rel="stylesheet" type = "text/css" href="{{ url_for ('static' , filename='css/messenger.css') }}">
-    <link rel="stylesheet" type = "text/css" href="{{ url_for ('static' , filename='css/messenger.css') }}">
-{% endblock %}
-{% block content %}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.1/socket.io.js"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messenger</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Messenger</h1>
+        <div id="messages">
+            {% for msg in msgsALL %}
+                <div class="message">
+                    <strong>{{ msg.senderID }}</strong>: {{ msg.msg }}
+                </div>
+            {% endfor %}
+        </div>
+        <form id="messageForm">
+            <input type="text" id="messageInput" placeholder="Type your message here..." required>
+            <button type="submit">Send</button>
+        </form>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
     <script>
-        const socket = io.connect();
+        const socket = io();
 
-        socket.on('connect', function () {
-            socket.emit('joined', {
-                user:"{{ name }}",
-                userid:"{{ sendersID }}",
-                friendID:"{{ friendID }}",
-                friend:'{{ friend }}'
-            })
+        const messageForm = document.getElementById('messageForm');
+        const messageInput = document.getElementById('messageInput');
 
-            let message_input = document.getElementById('message_input');
-            document.getElementById('sendmessage').onsubmit = function (e) {
-                e.preventDefault();
-                let message = message_input.value.trim();
-                if (message.length) {
-                    var newMSG = '<div class="usermsg"><h2> ' + message + ' </h2></div>';
-                    document.getElementById('messagelist').insertAdjacentHTML('afterbegin',newMSG);
-                    var msglist = document.getElementById("messagelist");
-                    msglist.scrollTop = msglist.scrollHeight;
-
-                    socket.emit('sendMessage', {
-                        user:"{{ name }}",
-                        userid:"{{ sendersID }}",
-                        friendID:"{{ friendID }}",
-                        friend:"{{ friend }}",
-                        message:message
-                    })
-                }
-                message_input.value = '';
-                message_input.focus();
-            }
+        messageForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const message = messageInput.value;
+            socket.emit('sendMessage', {
+                message: message,
+                userid: "{{ sendersID }}",
+                friendID: "{{ friendID }}"
+            });
+            messageInput.value = '';
         });
+
         socket.on('receiveMessage', function(data) {
-            var newMSG = '<div class="friendmsg"><h2>' + data.message + ' </h2></div>';
-            document.getElementById('messagelist').insertAdjacentHTML('afterbegin',newMSG);
-            var msglist = document.getElementById("messagelist");
-            msglist.scrollTop = msglist.scrollHeight;
+            const messagesDiv = document.getElementById('messages');
+            const newMessage = document.createElement('div');
+            newMessage.classList.add('message');
+            newMessage.innerHTML = `<strong>${data.userid}</strong>: ${data.message}`;
+            messagesDiv.appendChild(newMessage);
         });
-        var msglist = document.getElementById("messagelist");
-        msglist.scrollTop = msglist.scrollHeight;
     </script>
-
-    <h1 class="post">Chat with: <a href="/profile/{{ friend }}">{{ friend }}</a></h1>
-
-    <div id="messagelist" class="messagelist">
-    {% for msg in msgsALL|reverse %}
-        {% if msg[2] == sendersID %}
-            <div class="usermsg"><h2>{{ msg[1] }}</h2></div>
-        {% else %}
-            <div class="friendmsg"><h2>{{ msg[1] }}</h2></div>
-        {% endif %}
-    {% endfor %}
-    </div><br>
-
-
-    <form id="sendmessage">
-        <input type="text" id="message_input" placeholder="Message {{ friend }}...">
-        <button type="submit" id="message_button">Send</button>
-    </form>
-{% endblock %}
+</body>
+</html>

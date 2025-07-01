@@ -1,30 +1,43 @@
-{% extends 'layout.html' %}
-
-{% block css %}
-    <link rel="stylesheet" type = "text/css" href="{{ url_for ('static' , filename='css/market.css') }}">
-{% endblock %}
-
-{% block content %}
-    {% if empty %}
-            <h1>No results found for {{ searchedTerm }}</h1>
-    {% endif %}
-    {% if items %}
-        <h1 class="result">
-                <form id="marketSearch" method="post">
-            <input type="text" name="search" id ="search" size="50" placeholder="Search for item on market...">
-            <button type="submit" id="searchBtn">Search</button>
-            </form> Top results found for {{ searchedTerm }} <br><br>
-        </h1>
-        <h3 style="min-height:55px"><p style="color:white"><span style="float:left;margin-left:2%">Item Name</span><span style="float:right;margin-right:2%"> Current Price</span></p></h3>
-        {% for item in items %}
-            <h3><p style="color:white";><img src="https://community.akamai.steamstatic.com/economy/image/{{ (item.asset_description).icon_url }}/360fx360f"/><span style="float:left;margin-top:3%;margin-left:2%">{{item.hash_name}}</span>  <span style="color:white;float:right;margin-top:3%;margin-right:5%">{{item.sale_price_text}}</span></p></h3>
-        {% endfor %}
-    {% else %}
-        <h1 class="result">
-        <form id="marketSearch" method="post">
-            <input type="text" name="search" id ="search" size="50" placeholder="Search for item on market...">
-            <button type="submit" id="searchBtn">Search</button>
-            </form>
-        </h1>
-    {% endif %}
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Market Items</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Search Market Items</h1>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('app.home') }}">Home</a></li>
+                <li><a href="{{ url_for('app.friends') }}">Friends</a></li>
+                <li><a href="{{ url_for('app.logout') }}">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <form method="POST" action="{{ url_for('app.searchMarketItems') }}">
+            <input type="text" name="search" placeholder="Search for items..." required>
+            <button type="submit">Search</button>
+        </form>
+        {% if empty == 'empty' %}
+            <p>No items found for "{{ searchedTerm }}".</p>
+        {% else %}
+            <ul>
+                {% for item in items %}
+                    <li>
+                        <h2>{{ item.name }}</h2>
+                        <img src="{{ item.icon_url }}" alt="{{ item.name }}">
+                        <p>Price: {{ item.price }}</p>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </main>
+    <footer>
+        <p>&copy; 2023 Flask QA App</p>
+    </footer>
+</body>
+</html>

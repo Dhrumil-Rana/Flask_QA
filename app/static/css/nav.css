@@ -1,0 +1,78 @@
+@import url('base.css');
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 180px;
+    height: 100vh;
+    background: linear-gradient(to bottom, #2a475e, #1b2838);
+    box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+    z-index: 100;
+    padding-top: 40px;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column; /* Make it vertical */
+    gap: 0;
+}
+
+.sidebar ul li {
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+.sidebar ul li a {
+    display: flex;
+    align-items: center;
+    color: #fff;
+    padding: 14px 24px;
+    font-size: 1.1em;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 0 20px 20px 0;
+    transition: background 0.2s, color 0.2s;
+    width: 100%;
+}
+
+.sidebar ul li a .material-icons {
+    margin-right: 16px;
+    font-size: 1.4em;
+}
+
+.sidebar ul li a:hover,
+.sidebar ul li a.active {
+    background: #171a21;
+    color: #66c0f4;
+}
+
+/* Responsive: stack horizontally on small screens */
+@media (max-width: 900px) {
+    .sidebar {
+        position: static;
+        width: 100%;
+        height: auto;
+        box-shadow: none;
+        flex-direction: row;
+        padding-top: 10px;
+    }
+    .sidebar ul {
+        flex-direction: row;
+        justify-content: center;
+    }
+    .sidebar ul li {
+        margin: 0 8px;
+    }
+    .sidebar ul li a {
+        border-radius: 8px;
+        justify-content: center;
+        padding: 10px 12px;
+    }
+}
